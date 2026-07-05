@@ -4,7 +4,7 @@
      the badge Markdown Zenodo gives you, replacing the two placeholders below.
      Use the CONCEPT DOI (always resolves to the latest version), not a
      version-specific DOI. -->
-[![DOI](https://zenodo.org/badge/xxxxx.svg)](https://doi.org/10.5281/zenodo.xxxxx)
+[![DOI](https://zenodo.org/badge/1290349685.svg)](https://doi.org/10.5281/zenodo.21210653)
 
 Code, pinned environment, and complete experimental record for a
 single-author IEEE Letters manuscript studying what test-time
@@ -45,8 +45,7 @@ provenance tracking (frozen accuracies are exact dyadic rationals)
 made the distortion detectable, diagnosable, and correctable. The full
 mechanism, the falsification test that confirmed it, and every
 superseded number with its cause are recorded in
-[`results/RESULTS.md`](results/RESULTS.md) (Sections 7–8) and
-[`CHANGELOG.md`](CHANGELOG.md).
+[`results/RESULTS.md`](results/RESULTS.md) (Sections 7–8)
 
 Practical rules that fell out of this: evaluate once, at the final
 step; never let an evaluation touch a model that will continue

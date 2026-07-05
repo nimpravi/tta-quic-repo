@@ -10,7 +10,7 @@ repository-code: "https://github.com/nimpravi/tta-quic-repo"
 url: "https://github.com/nimpravi/tta-quic-repo"
 identifiers:
   - type: doi
-    value: "10.5281/zenodo.xxxx"
+    value: "10.5281/zenodo.21210654"
     description: "Zenodo archive of this repository"
 license: MIT
 version: "1.0.0"
