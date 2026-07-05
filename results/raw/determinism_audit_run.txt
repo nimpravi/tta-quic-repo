@@ -1,0 +1,16 @@
+# Console output — determinism audit (loader + compute path)
+# scripts: diagnostics/diag_loader_determinism.py, diag_compute_determinism.py
+
+--- LOADER (diag_loader_determinism.py --size S) ---
+Q1 same-loader re-iteration:  identical order=True  content=True
+Q2 fresh-build no-seed:        identical order=True  content=True
+Q3 fresh-build seed=0:         identical order=True  content=True
+VERDICT: loader fully deterministic across builds, even without seeding.
+
+--- COMPUTE PATH (diag_compute_determinism.py --size S) ---
+     lr steps    q |  run A rec  run B rec    delta
+  1e-03   100  0.5 |    +3.880p    +3.880p  +0.000p
+  5e-03   100  0.5 |    +0.000p    +0.000p  +0.000p
+(with seed=0 both times: identical, deltas +0.000p)
+VERDICT: no run-to-run nondeterminism. "Seeds" must vary a deliberate factor
+(adaptation batch order), not hope for pipeline noise.

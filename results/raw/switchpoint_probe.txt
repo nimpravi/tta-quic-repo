@@ -1,0 +1,19 @@
+=== SWITCH-POINT PROBE on W-2022-46 (tuning week ONLY; W-47 untouched) ===
+device=cpu
+W-46 frozen acc = 0.7535 (n=60)
+
+   switch25: frozen=0.7535 adapted=0.7904 rec=+3.69p (elapsed 5.7m)
+   switch50: frozen=0.7535 adapted=0.7923 rec=+3.88p (elapsed 11.5m)
+   switch75: frozen=0.7535 adapted=0.7811 rec=+2.76p (elapsed 17.4m)
+    pure100: frozen=0.7535 adapted=0.7581 rec=+0.46p (elapsed 23.3m)
+
+==== SWITCH-POINT SENSITIVITY (W-46, natural order, final-eval) ====
+  pure-50 reference (clean grid): +2.68p
+  two-phase, freeze@25: +3.69p
+  two-phase, freeze@50: +3.88p
+  two-phase, freeze@75: +2.76p
+  pure-100 (no freeze)  : +0.46p
+
+  One-sentence use in III-E: report whether the 25/50/75 values
+  are close (switch point not special) or spread (sensitive),
+  on the tuning week, without touching W-47.

@@ -1,0 +1,32 @@
+# Console output — headline error-bar run (K=8, S split)
+# script: scripts/02_errorbars.py  (run at K=8; the archived run predates the
+# --K flag default change but is numerically identical)
+
+=== TUNING on W-2022-46 (validation, deterministic) ===
+device=cpu
+W-46 frozen acc = 0.7535  (n=60)
+     lr  steps  quant |  frozen   adapt     rec
+------------------------------------------------
+  1e-03     50    0.5 |  0.7535  0.7803  +2.68p
+  1e-03     50    1.0 |  0.7535  0.7670  +1.35p
+  1e-03    100    0.5 |  0.7535  0.7923  +3.88p
+  1e-03    100    1.0 |  0.7535  0.7761  +2.26p
+  5e-03     50    0.5 |  0.7535  0.7535  +0.00p
+  5e-03     50    1.0 |  0.7535  0.7535  +0.00p
+  5e-03    100    0.5 |  0.7535  0.7535  +0.00p
+  5e-03    100    1.0 |  0.7535  0.7535  +0.00p
+BEST on W-46: lr=1e-03 steps=100 quant=0.5 (recovered +3.88p on W-46)
+
+=== REPORTING on W-2022-47: K=8 adaptation-orderings x 3 windows ===
+  window 1 (skip=0,   base=0.7224): recovery +4.74p ± 0.20  [min +4.36, max +5.10]
+  window 2 (skip=200, base=0.7243): recovery +4.12p ± 0.17
+  window 3 (skip=400, base=0.7395): recovery +4.15p ± 0.26
+# note: window-1 min/max confirmed via diagnostics/diag_window1_ordering.py;
+# windows 2-3 min/max were not separately recorded (only mean±std printed).
+
+==== ERROR-BAR RESULT (S split, n=200/window) ====
+  W-47 frozen acc = 0.7287  (gap 0.1383)
+  HEADLINE (adaptation-order variation): +4.34p ± 0.36 (24 orderings)
+    = 31.4% of gap; conservative (mean-1sd) +3.98p (28.8%)
+    mean within-window order-std = 0.21p
+  SECONDARY (across windows): means +4.74, +4.12, +4.15  (std 0.29p)

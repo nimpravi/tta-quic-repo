@@ -1,0 +1,131 @@
+{
+ "0": {
+  "n_samples": 409600,
+  "n_true_classes": 102,
+  "acc_frozen": 0.72239013671875,
+  "acc_adapted": 0.7558740234375,
+  "macroF1_frozen": 0.814292787211183,
+  "macroF1_adapted": 0.8119813460588281,
+  "distinct_pred_frozen": 102,
+  "distinct_pred_adapted": 102,
+  "pred_entropy_frozen": 0.7093887158788975,
+  "pred_entropy_adapted": 0.7162156373045525,
+  "classes_recall_up": 38,
+  "classes_recall_down": 49,
+  "classes_recall_same": 15,
+  "top5_gain_class_ids": [
+   19,
+   59,
+   57,
+   55,
+   42
+  ],
+  "top5_gain_dmass": [
+   0.0248193359375,
+   0.024248046875,
+   0.015981445312500002,
+   0.010327148437500003,
+   0.00476806640625
+  ],
+  "top5_loss_class_ids": [
+   101,
+   61,
+   62,
+   66,
+   41
+  ],
+  "top5_loss_dmass": [
+   -0.035891113281250005,
+   -0.027416992187500003,
+   -0.0110595703125,
+   -0.010324707031249998,
+   -0.00459716796875001
+  ]
+ },
+ "1": {
+  "n_samples": 409600,
+  "n_true_classes": 102,
+  "acc_frozen": 0.72425537109375,
+  "acc_adapted": 0.75250732421875,
+  "macroF1_frozen": 0.8088589932856584,
+  "macroF1_adapted": 0.8075895753512902,
+  "distinct_pred_frozen": 102,
+  "distinct_pred_adapted": 102,
+  "pred_entropy_frozen": 0.7179469969376189,
+  "pred_entropy_adapted": 0.7191331792228443,
+  "classes_recall_up": 38,
+  "classes_recall_down": 53,
+  "classes_recall_same": 11,
+  "top5_gain_class_ids": [
+   59,
+   19,
+   57,
+   55,
+   41
+  ],
+  "top5_gain_dmass": [
+   0.023681640625,
+   0.02057373046875,
+   0.013579101562500001,
+   0.01013916015625,
+   0.004035644531249993
+  ],
+  "top5_loss_class_ids": [
+   101,
+   61,
+   62,
+   66,
+   29
+  ],
+  "top5_loss_dmass": [
+   -0.034550781249999996,
+   -0.026264648437500003,
+   -0.01188720703125,
+   -0.008615722656250005,
+   -0.0018701171874999992
+  ]
+ },
+ "2": {
+  "n_samples": 409600,
+  "n_true_classes": 102,
+  "acc_frozen": 0.73946044921875,
+  "acc_adapted": 0.767109375,
+  "macroF1_frozen": 0.7938679505648732,
+  "macroF1_adapted": 0.7924459099326367,
+  "distinct_pred_frozen": 102,
+  "distinct_pred_adapted": 102,
+  "pred_entropy_frozen": 0.7149892022313875,
+  "pred_entropy_adapted": 0.7281924701795892,
+  "classes_recall_up": 45,
+  "classes_recall_down": 48,
+  "classes_recall_same": 9,
+  "top5_gain_class_ids": [
+   59,
+   19,
+   57,
+   55,
+   49
+  ],
+  "top5_gain_dmass": [
+   0.024716796875000002,
+   0.020222167968749996,
+   0.016479492187500003,
+   0.013254394531249998,
+   0.00655517578125
+  ],
+  "top5_loss_class_ids": [
+   101,
+   61,
+   41,
+   62,
+   66
+  ],
+  "top5_loss_dmass": [
+   -0.03442382812500001,
+   -0.020180664062500006,
+   -0.015793457031250013,
+   -0.011494140625,
+   -0.010041503906249999
+  ]
+ }
+}

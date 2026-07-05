@@ -1,0 +1,14 @@
+=== COLLAPSE CHECK on W-2022-47 (quant=0.5, frozen config) ===
+device=cpu
+  n_avail=650, using 200/window
+
+  window 1: acc 0.7224 -> 0.7564 (+3.41p) | macroF1 0.8143 -> 0.8102 (-0.41p) | distinct preds 102 -> 102 | pred-entropy 0.709 -> 0.719 | recall up/down/same 39/50/13 (elapsed 11.1m)
+  window 2: acc 0.7243 -> 0.7537 (+2.94p) | macroF1 0.8089 -> 0.8097 (+0.08p) | distinct preds 102 -> 102 | pred-entropy 0.718 -> 0.721 | recall up/down/same 41/51/10 (elapsed 20.3m)
+  window 3: acc 0.7395 -> 0.7692 (+2.97p) | macroF1 0.7939 -> 0.7946 (+0.07p) | distinct preds 102 -> 102 | pred-entropy 0.715 -> 0.729 | recall up/down/same 41/50/11 (elapsed 28.3m)
+
+==== COLLAPSE CHECK SUMMARY (quant=0.5, k=0 orderings) ====
+  mean accuracy delta : +3.11p  (sanity: k=0 headline vals +3.41/+2.94/+2.97)
+  mean macro-F1 delta : -0.09p
+  mean pred-entropy delta: +0.0091 (negative = concentration)
+  VERDICT: macro-F1 DEGRADES while accuracy improves -> partial collapse. The manuscript must report both and qualify the claim.
+  Full per-class details in collapse_check_q0.5_steps50.json.

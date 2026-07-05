@@ -1,0 +1,27 @@
+=== ORACLE CEILING (matched) on W-2022-47: labeled CE, lr=1e-03, steps=50, K=3 ===
+device=cpu
+  n_avail=650, using 200/window
+
+W-47 self-check (window 1) = 0.7224
+
+=== 3 orderings x 3 windows = 9 units ===
+
+  [1/9] window 1 ord 1: frozen=0.7224 oracle=0.8423 rec=+11.99p (elapsed 8.3m)
+  [2/9] window 1 ord 2: frozen=0.7224 oracle=0.8424 rec=+12.00p (elapsed 16.6m)
+  [3/9] window 1 ord 3: frozen=0.7224 oracle=0.8433 rec=+12.09p (elapsed 24.9m)
+  [4/9] window 2 ord 1: frozen=0.7243 oracle=0.8387 rec=+11.44p (elapsed 33.2m)
+  [5/9] window 2 ord 2: frozen=0.7243 oracle=0.8399 rec=+11.56p (elapsed 41.4m)
+  [6/9] window 2 ord 3: frozen=0.7243 oracle=0.8397 rec=+11.54p (elapsed 49.7m)
+  [7/9] window 3 ord 1: frozen=0.7395 oracle=0.8513 rec=+11.18p (elapsed 57.9m)
+  [8/9] window 3 ord 2: frozen=0.7395 oracle=0.8494 rec=+11.00p (elapsed 66.2m)
+  [9/9] window 3 ord 3: frozen=0.7395 oracle=0.8506 rec=+11.12p (elapsed 74.4m)
+
+==== ORACLE (matched) RESULT (S, n=200/window, K=3) ====
+  oracle recovery: +11.55p ± 0.38
+  per-window means: +12.02, +11.52, +11.10
+
+  Calibration of the label-free headline:
+    headline +3.06p ± 0.27  =  26.5% of the matched labeled ceiling
+    (gap fractions: headline 13.5% of 22.65p; matched ceiling 51.0% of 22.65p)
+
+  Paste these into the TODO(oracle) slot in sections/conclusion.tex.

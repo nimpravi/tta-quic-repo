@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both the software and the paper."
+title: "Subscriber-Level Machine Learning for Telecom CDR Fraud Detection: Quantifying and Removing Data Leakage"
+type: software
+authors:
+  - family-names: "Hegde"
+    given-names: "Praveen"
+    orcid: "https://orcid.org/0009-0004-7395-3491"
+repository-code: "https://github.com/nimpravi/tta-quic-repo"
+url: "https://github.com/nimpravi/tta-quic-repo"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.xxxx"
+    description: "Zenodo archive of this repository"
+license: MIT
+version: "1.0.0"
+date-released: "2026-07-05"
+keywords:
+  - batch normalization
+  - concept drift
+  - encrypted traffic classification
+  - machine learning
+  - network monitoring
+  - QUIC
+  - test-time adaptation
+preferred-citation:
+  type: article
+  title: "Decomposing Label-Free Test-Time Adaptation for Encrypted QUIC Traffic Classification Under Abrupt Temporal Drift"
+  authors:
+    - family-names: "Hegde"
+      given-names: "Praveen"
+  journal: "IEEE Communications Letters"
+  year: 2026

@@ -1,0 +1,42 @@
+# PROVENANCE: restored from my saved console output of this run
+# (numbers verbatim; line breaks re-flowed). This is
+# the K=8 STEP-2 run (best-over-checkpoints hybrid vintage; superseded,
+# see ../RESULTS.md 7.1). Its per-window envelopes were used to verify
+# the leakage-demo reconstruction (RESULTS 8.3), including window 3's
+# minimum +3.71 matching the reconstructed ord-1 unit exactly.
+
+=== TUNING on W-2022-46 (validation, deterministic) ===
+device=cpu
+W-46 frozen acc = 0.7535  (n=60)
+     lr  steps  quant |  frozen   adapt     rec
+------------------------------------------------
+  1e-03     50    0.5 |  0.7535  0.7803  +2.68p
+  1e-03     50    1.0 |  0.7535  0.7670  +1.35p
+  1e-03    100    0.5 |  0.7535  0.7923  +3.88p
+  1e-03    100    1.0 |  0.7535  0.7761  +2.26p
+  5e-03     50    0.5 |  0.7535  0.7535  +0.00p
+  5e-03     50    1.0 |  0.7535  0.7535  +0.00p
+  5e-03    100    0.5 |  0.7535  0.7535  +0.00p
+  5e-03    100    1.0 |  0.7535  0.7535  +0.00p
+BEST on W-46: lr=1e-03 steps=100 quant=0.5 (recovered +3.88p on W-46)
+  ^ FROZEN. W-47 played no part. Chosen with NO shuffle (deterministic).
+
+=== PROBING W-2022-47 capacity ===
+  W-47 has >=650 batches (cap=650)
+  Using EVAL_BATCHES=200/repeat (target met)
+W-47 baseline self-check (window 1) = 0.7224
+
+=== REPORTING on W-2022-47: K=8 adaptation-orderings x 3 windows ===
+  (frozen config lr=1e-03 steps=100 quant=0.5; eval on full window, only adaptation order varies)
+  window 1 (skip=0, base=0.7224): recovery +4.74p ± 0.20  over K=8 orderings [min +4.36, max +5.10]
+  window 2 (skip=200, base=0.7243): recovery +4.12p ± 0.17  over K=8 orderings [min +3.81, max +4.35]
+  window 3 (skip=400, base=0.7395): recovery +4.15p ± 0.26  over K=8 orderings [min +3.71, max +4.60]
+
+==== ERROR-BAR RESULT (S split, n=200/window) ====
+  W-47 frozen acc = 0.7287  (gap 0.1383)
+  --- HEADLINE (Option A: adaptation-order variation) ---
+  recovery = +4.34p ± 0.36 (pooled over 8x3=24 orderings)
+  = 31.4% of gap; conservative (mean-1sd) +3.98p (28.8%)
+  mean within-window order-std = 0.21p (sensitivity to arrival order)
+  --- SECONDARY (Option B: across-window heterogeneity) ---
+  per-window means: +4.74, +4.12, +4.15  (std across windows = 0.29p)

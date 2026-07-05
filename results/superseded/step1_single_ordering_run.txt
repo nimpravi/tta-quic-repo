@@ -1,0 +1,38 @@
+# PROVENANCE: restored from my saved console output of this run
+# (numbers verbatim; line breaks re-flowed). This is
+# the STEP-1 pipeline (leakage_clean_tent.py, best-over-checkpoints
+# evaluation -- see ../RESULTS.md 7.1-7.2 for why it is superseded).
+
+=== TUNING on W-2022-46 (validation) ===
+device=cpu
+W-46 frozen acc = 0.7535  (n=60 batches)
+     lr  steps  quant |  frozen   adapt     rec
+------------------------------------------------
+  1e-03     50    0.5 |  0.7535  0.7803  +2.68p
+  1e-03     50    1.0 |  0.7535  0.7670  +1.35p
+  1e-03    100    0.5 |  0.7535  0.7923  +3.88p
+  1e-03    100    1.0 |  0.7535  0.7761  +2.26p
+  5e-03     50    0.5 |  0.7535  0.7535  +0.00p
+  5e-03     50    1.0 |  0.7535  0.7535  +0.00p
+  5e-03    100    0.5 |  0.7535  0.7535  +0.00p
+  5e-03    100    1.0 |  0.7535  0.7535  +0.00p
+BEST on W-46: lr=1e-03 steps=100 quant=0.5 (recovered +3.88p on W-46)
+  ^ this config is now FROZEN. W-47 played no part in choosing it.
+
+=== PROBING W-2022-47 capacity (data-only, no model calls) ===
+  W-47 loader has >=650 batches available (probed up to cap=650)
+  Using EVAL_BATCHES=200/repeat (target met).
+
+=== REPORTING on W-2022-47 (test, frozen config) ===
+W-47 baseline self-check: frozen acc = 0.7224  (n=200, repeat-1 window)
+  repeat 1 (n=200, skip=0, adapt+eval on SAME window): frozen=0.7224 adapted=0.7786 recovery=+5.62p
+  repeat 2 (n=200, skip=200, adapt+eval on SAME window): frozen=0.7243 adapted=0.7663 recovery=+4.21p
+  repeat 3 (n=200, skip=400, adapt+eval on SAME window): frozen=0.7395 adapted=0.7809 recovery=+4.15p
+
+==== LEAKAGE-CLEAN RESULT (widened + window-aligned, n=200/repeat) ====
+  config tuned on W-46, reported on W-47 (never peeked)
+  W-47 frozen acc = 0.7287 ± 0.0076  (gap 0.1383)
+  recovery = +4.66p ± 0.68 (33.7% of gap)
+  conservative (mean-1sd) = +3.98p (28.8% of gap)
+  -> HOLDS leakage-clean. This is the number for the paper.
+     Next: seed/adaptation-ordering variation for final error bars.

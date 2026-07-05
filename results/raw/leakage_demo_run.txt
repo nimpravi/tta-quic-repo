@@ -1,0 +1,18 @@
+=== LEAKAGE DEMO on W-2022-47: old rule (best-over-ckpts) vs clean rule (final), SAME trajectory ===
+    old config: lr=1e-03 steps=100 quant=0.5, k=0 orderings
+
+device=cpu
+n_avail=650, using 200/window
+
+ win   frozen   acc@50  acc@100 |  BEST rec FINAL rec inflation
+------------------------------------------------------------------
+   1   0.7224   0.7564   0.7697 |    +4.73p    +4.73p    +0.00p   (elapsed 13.6m)
+   2   0.7243   0.7537   0.7644 |    +4.01p    +4.01p    +0.00p   (elapsed 27.0m)
+   3   0.7395   0.7692   0.7765 |    +3.71p    +3.71p    +0.00p   (elapsed 40.4m)
+
+==== VERDICT (rules fixed in docstring before running) ====
+  FINAL rule: +4.73, +4.01, +3.71  (expected +3.35, +2.83, +2.76)  -> MISMATCH
+  BEST  rule: +4.73, +4.01, +3.71  (expected in archived families)  -> MATCH
+
+  FINAL rule does not reproduce the collapse-check values; something
+  is inconsistent in the pipeline. STOP and report this log.

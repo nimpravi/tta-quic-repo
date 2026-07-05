@@ -1,0 +1,15 @@
+=== DEPTH PROBE on W-2022-47 (frozen W-44 model, eval only) ===
+device=cpu
+  walked 2000 batches (cap 2000)
+  offset     0: acc = 0.7459   (flows ~0 to ~15,360)
+  offset   200: acc = 0.7232   (flows ~51,200 to ~66,560)
+  offset   400: acc = 0.7450   (flows ~102,400 to ~117,760)
+  offset   700: acc = 0.7094   (flows ~179,200 to ~194,560)
+  offset  1000: acc = 0.7374   (flows ~256,000 to ~271,360)
+  offset  1400: acc = 0.7205   (flows ~358,400 to ~373,760)
+  offset  1800: acc = 0.7517   (flows ~460,800 to ~476,160)
+
+=== READING ===
+  trace: 0.746, 0.723, 0.745, 0.709, 0.737, 0.720, 0.752  (max-min = 0.042)
+  Trace is intermediate/noisy. Report it; decide on the
+  denominator together before drafting.

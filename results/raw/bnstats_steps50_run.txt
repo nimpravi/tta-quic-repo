@@ -1,0 +1,27 @@
+=== BN-STATS-ONLY CONTROL on W-2022-47 (no tuning stage; matched control) ===
+device=cpu
+  n_avail=650, using 200/window
+
+W-47 self-check (window 1) = 0.7224
+
+=== CONTROL: 3 orderings x 3 windows = 9 passes (steps=50, momentum=0.1, NO gradients) ===
+
+  [1/9] window 1 ord 1: frozen=0.7224 adapted=0.7491 rec=+2.67p (elapsed 6.8m)
+  [2/9] window 1 ord 2: frozen=0.7224 adapted=0.7488 rec=+2.64p (elapsed 13.7m)
+  [3/9] window 1 ord 3: frozen=0.7224 adapted=0.7486 rec=+2.62p (elapsed 20.7m)
+  [4/9] window 2 ord 1: frozen=0.7243 adapted=0.7472 rec=+2.29p (elapsed 27.6m)
+  [5/9] window 2 ord 2: frozen=0.7243 adapted=0.7475 rec=+2.33p (elapsed 34.6m)
+  [6/9] window 2 ord 3: frozen=0.7243 adapted=0.7485 rec=+2.42p (elapsed 41.5m)
+  [7/9] window 3 ord 1: frozen=0.7395 adapted=0.7624 rec=+2.29p (elapsed 48.5m)
+  [8/9] window 3 ord 2: frozen=0.7395 adapted=0.7630 rec=+2.35p (elapsed 55.7m)
+  [9/9] window 3 ord 3: frozen=0.7395 adapted=0.7624 rec=+2.29p (elapsed 62.7m)
+
+==== BN-STATS-ONLY RESULT (S, n=200/window, K=3) ====
+  W-47 frozen acc = 0.7287 (gap 0.1383)
+  BN-STATS-ONLY recovery: +2.43p ± 0.15 (17.6% of gap)
+  per-window means: +2.64, +2.35, +2.31
+  mean within-window order-std = 0.03p
+
+  Compare against: quant=0.5 clean headline (+3.06p ± 0.27, K=5 final-eval)
+  and quant=1.0 from script 03's steps=50 rerun.
+  Done. Delete bnstats_progress_steps50.json before a fresh run.

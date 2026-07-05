@@ -1,0 +1,22 @@
+# Console output — mechanism contrast, quant=1.0 (no filtering), K=3, S split
+# script: scripts/03_mechanism_errorbars.py --size S --K 3
+
+=== MECHANISM error bars: quant=1.0 (no filtering), lr=1e-03 steps=100 ===
+  device=cpu, n_avail=650, using 200/window
+  [1/9] window 1 ord 1: rec=+1.10p
+  [2/9] window 1 ord 2: rec=+1.09p
+  [3/9] window 1 ord 3: rec=+1.30p
+  [4/9] window 2 ord 1: rec=+0.73p
+  [5/9] window 2 ord 2: rec=+0.35p
+  [6/9] window 2 ord 3: rec=+0.27p
+  [7/9] window 3 ord 1: rec=+0.43p
+  [8/9] window 3 ord 2: rec=+0.62p
+  [9/9] window 3 ord 3: rec=+0.30p
+
+==== MECHANISM CONTRAST (S, n=200/window, K=3) ====
+  quant=1.0 (NO filtering):  +0.69p ± 0.37  (5.0% of gap)
+      per-window: +1.17, +0.45, +0.45  (order-std 0.14p)
+  quant=0.5 (filtering)   :  +4.34p ± 0.36  [from headline run]
+      per-window: +4.74, +4.12, +4.15
+  FILTERING LIFT = +3.65p  (0.5 minus 1.0)
+  => MECHANISM CLAIM HOLDS with error bars: filtering is load-bearing.

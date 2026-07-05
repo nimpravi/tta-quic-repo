@@ -1,0 +1,25 @@
+# data & models (downloaded on first use; large)
+data/
+models/
+*.h5
+*.pt
+*.pth
+
+# python
+__pycache__/
+*.pyc
+tent-env/
+.venv/
+
+# latex build
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+
+# local run outputs not meant for the record
+manuscript/

@@ -1,0 +1,12 @@
+# Console output — ordering-effect generality check (natural vs shuffle, all windows)
+# script: diagnostics/diag_ordering_generality.py --size S
+
+window 2 (skip=200): frozen=0.7243 natural_final=0.7529 natural_rec=+2.86p
+window 3 (skip=400): frozen=0.7395 natural_final=0.7681 natural_rec=+2.86p
+
+==== ORDERING EFFECT: natural vs shuffle, per window ====
+ window |  natural |  shuffle mean |  above band?
+      1 |   +5.62p |  +4.74±0.20p |          YES
+      2 |   +2.86p |  +4.12±0.17p |           no
+      3 |   +2.86p |  +4.15±0.26p |           no
+VERDICT: natural beats band in 1/3 windows -> effect NOT general -> DROPPED.
