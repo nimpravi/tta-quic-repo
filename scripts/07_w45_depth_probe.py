@@ -169,8 +169,7 @@ def main():
             print("  yet; check datazoo test-loader ordering semantics, or increase")
             print("  --cap if the split is much larger than the walked depth.")
         else:
-            print("  Trace is intermediate/noisy. Report it; decide on the")
-            print("  denominator together before drafting.")
+            print("  Trace is intermediate/noisy; reported for completeness.")
 
 
 if __name__ == "__main__":

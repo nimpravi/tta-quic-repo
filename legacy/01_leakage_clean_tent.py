@@ -1,59 +1,52 @@
 #!/usr/bin/env python3
 r"""
-leakage_clean_tent.py — HONEST TENT evaluation, no selection leakage.
+07_w45_depth_probe.py -- locate the drift event WITHIN W-2022-45 (eval only).
 
-STEP 1 CHANGES (widen W-47 eval) — kept from prior revision:
-  - TUNE_EVAL_BATCHES (60) vs TARGET_TEST_EVAL_BATCHES (200) are separate.
-  - count_available_batches() probes W-47 capacity (data-only) before
-    committing to a widened EVAL_BATCHES, and clips honestly if the split
-    can't support 200/repeat x REPEATS non-overlapping slices.
+CONTEXT:
+  Script 06 measured the frozen W-44 model at 0.9552 on the first 600
+  batches of W-45, far above both the cited ~0.867 and the earlier "~0.87
+  on W-45" working note. The literature dates the Google certificate
+  change to DURING week 45. If the datazoo test loader is time-ordered,
+  the first 600 batches are early-week (pre-event) traffic, and accuracy
+  should DROP partway through the week, toward the ~0.73 seen on W-46/47.
 
-WINDOW-ALIGNMENT FIX (this revision) — the important one:
-  Previously, tent()'s adaptation loop always pulled batches from
-  `iter(loader)` starting at position 0, regardless of the `skip` used for
-  evaluation. So repeat 3 (skip=400) was EVALUATED on batches 400-599 but
-  ADAPTED on batches 0-99 every time -- the three "repeats" never actually
-  adapted on the window they were scored against.
+WHAT THIS SCRIPT DOES:
+  Walks deeper into the W-45 test loader and evaluates thin windows
+  (60 batches) at increasing offsets, tracing accuracy vs position.
 
-  Fix: collect_window(loader, skip, n) materializes exactly the batches for
-  one window ONCE. tent() now adapts AND evaluates on that same cached
-  window, cycling through it in stream order (same cycling behavior as
-  before, just now aligned to the correct slice). No shuffling/seeding
-  introduced yet -- that's the separate, later step.
+READ THE RESULT LIKE THIS (rules fixed before running):
+  - Accuracy starts ~0.95 and drops to ~0.73-0.80 at some offset ->
+    hypothesis confirmed: loader is time-ordered, event is mid-week,
+    0.9552 (early-W-45) is the honest PRE-SHIFT reference, and the paper's
+    gap denominator becomes acc(early W-45) - acc(W-47). Bonus: this trace
+    is a clean one-panel drift figure and corroborates the literature's
+    event timing.
+  - Accuracy stays ~0.95 at every offset -> hypothesis WRONG (loader may
+    be shuffled, or the event does not manifest in this split). Do NOT
+    adopt 0.9552 as the denominator yet; the cited-0.867 discrepancy is
+    unexplained and needs investigation (check cesnet-datazoo docs for
+    test-loader ordering semantics).
+  - Anything intermediate/noisy -> record the trace and re-examine
+    before choosing the denominator.
 
-Protocol (unchanged):
-  1. TUNE on W-2022-46 (validation week): small grid over (lr, steps, quantile).
-     Adaptation is label-free; W-46 labels used ONLY to score each config.
-  2. FREEZE the config that recovers most on W-46.
-  3. REPORT on W-2022-47 (test week): apply the frozen config, adapt label-free
-     on each window, evaluate on that SAME window. W-47 never influences any
-     tuning choice.
+RUNTIME: data-only capacity walk (up to --cap batches) plus
+  len(offsets) x 60 eval batches. Roughly 20-30 min CPU at defaults.
 
-Windows/CPU/16GB friendly. Run:
-
-    python leakage_clean_tent.py            # XS
-    python leakage_clean_tent.py --size S   # later, for hardening
+Run:
+    python 07_w45_depth_probe.py --size S
+    # optionally: --cap 3000 to walk deeper, --week W-2022-46 for other weeks
+    # results appended to w45_depth_probe.json
 """
-import argparse, copy, itertools, sys
+import argparse, sys, os, json
 import numpy as np
 
 DATA_DIR   = "./data/CESNET-QUIC22/"
 MODEL_DIR  = "./models/"
 TRAIN_WEEK = "W-2022-44"
-VAL_WEEK   = "W-2022-46"     # tune here
-TEST_WEEK  = "W-2022-47"     # report here (frozen config only)
-IN_PERIOD  = 0.867
 BATCH      = 256
+OUT_JSON   = "w45_depth_probe.json"
 
-TUNE_EVAL_BATCHES        = 60    # tuning stage stays cheap
-TARGET_TEST_EVAL_BATCHES = 200   # goal for the widened W-47 report
-MIN_TEST_EVAL_BATCHES    = 60    # floor -- don't quietly go below what already worked
-REPEATS    = 3
-
-# small honest grid (tuned on W-46 only)
-GRID_LR       = [1e-3, 5e-3]
-GRID_STEPS    = [50, 100]
-GRID_QUANTILE = [0.5, 1.0]   # 1.0 = no filtering (vanilla-ish); 0.5 = stabilized
+PROBE_N    = 60          # thin windows: enough signal, cheap
 
 
 def build_loader(ds, cfg_kwargs, DatasetConfig):
@@ -63,18 +56,14 @@ def build_loader(ds, cfg_kwargs, DatasetConfig):
 
 
 def build(size, test_week):
-    """Pretrained model + a test dataloader for `test_week`, with the weights'
-    own transforms attached (so flowstats arrive as the 43-dim the model wants)."""
     import torch
     from cesnet_datazoo.datasets import CESNET_QUIC22
     from cesnet_datazoo.config import DatasetConfig, AppSelection
     from cesnet_models.models import mm_cesnet_v2, MM_CESNET_V2_Weights
-
     weights = MM_CESNET_V2_Weights.CESNET_QUIC22_Week44
     model = mm_cesnet_v2(weights=weights, model_dir=MODEL_DIR)
     model.eval()
     transforms = weights.transforms
-
     ds = CESNET_QUIC22(DATA_DIR, size=size)
     cfg_kwargs = dict(
         dataset=ds, apps_selection=AppSelection.ALL_KNOWN,
@@ -107,34 +96,6 @@ def fwd(model, batch, device):
                   torch.as_tensor(fs).float().to(device))), y
 
 
-def count_available_batches(loader, cap):
-    """Walk the loader WITHOUT running the model, just to see how many
-    batches actually exist (capped so this can't run away on a huge split)."""
-    n = 0
-    for _ in loader:
-        n += 1
-        if n >= cap:
-            break
-    return n
-
-
-def collect_window(loader, skip, n, label=""):
-    """Materialize exactly n batches starting at index `skip`, walking the
-    loader once. This window is then reused for BOTH adaptation and
-    evaluation, so the two are guaranteed to be on the same slice of data."""
-    batches = []
-    for i, b in enumerate(loader):
-        if i < skip:
-            continue
-        batches.append(b)
-        if len(batches) >= n:
-            break
-    if len(batches) < n:
-        print(f"  [WARN]{(' ' + label) if label else ''} requested n={n} batches "
-              f"but only collected {len(batches)} (skip={skip}).")
-    return batches
-
-
 def accuracy_on_batches(model, batches, device):
     import torch
     from sklearn.metrics import accuracy_score
@@ -146,120 +107,69 @@ def accuracy_on_batches(model, batches, device):
     return accuracy_score(np.concatenate(ys), np.concatenate(ps))
 
 
-def tent(base_model, window_batches, device, lr, steps, quantile):
-    """Label-free BN-stats TENT. Adapts AND evaluates on the SAME
-    window_batches (fixes the earlier bug where adaptation always used
-    batches from position 0 regardless of which window was being scored)."""
-    import torch, torch.nn as nn, torch.nn.functional as F
-    frozen = accuracy_on_batches(base_model, window_batches, device)
-    m = copy.deepcopy(base_model); m.requires_grad_(False); params = []
-    for mod in m.modules():
-        if isinstance(mod, (nn.BatchNorm1d, nn.BatchNorm2d)):
-            mod.requires_grad_(True); mod.train(); mod.momentum = 0.1
-            if mod.weight is not None: params.append(mod.weight)
-            if mod.bias   is not None: params.append(mod.bias)
-    opt = torch.optim.Adam(params, lr=lr)
-    best = frozen
-    n = len(window_batches)
-    for s in range(steps):
-        b = window_batches[s % n]   # cycle through the SAME window used for eval
-        lo, _ = fwd(m, b, device)
-        ent = -(F.softmax(lo,1) * F.log_softmax(lo,1)).sum(1)
-        if quantile < 1.0:
-            sel = ent <= torch.quantile(ent.detach(), quantile)
-            loss = ent[sel].mean() if sel.any() else ent.mean()
-        else:
-            loss = ent.mean()
-        opt.zero_grad(); loss.backward(); opt.step()
-        if (s+1) % 50 == 0:
-            best = max(best, accuracy_on_batches(m, window_batches, device))
-    return frozen, best
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--size", default="XS")
+    ap.add_argument("--week", default="W-2022-45")
+    ap.add_argument("--cap",  type=int, default=2000,
+                    help="max batches to walk when probing capacity")
     args = ap.parse_args()
 
-    # ---------- 1. TUNE on W-46 ----------
-    print(f"=== TUNING on {VAL_WEEK} (validation) ===")
-    vmodel, vloader, device = build(args.size, VAL_WEEK)
+    results = {}
+    if os.path.exists(OUT_JSON):
+        with open(OUT_JSON) as f: results = json.load(f)
+
+    print(f"=== DEPTH PROBE on {args.week} (frozen W-44 model, eval only) ===")
+    model, loader, device = build(args.size, args.week)
     print(f"device={device}")
-    val_window = collect_window(vloader, skip=0, n=TUNE_EVAL_BATCHES, label="W-46 tuning window")
-    vbase = accuracy_on_batches(vmodel, val_window, device)
-    print(f"W-46 frozen acc = {vbase:.4f}  (n={len(val_window)} batches)\n")
-    print(f"{'lr':>7} {'steps':>6} {'quant':>6} | {'frozen':>7} {'adapt':>7} {'rec':>7}")
-    print("-" * 48)
-    tuning = []
-    for lr, steps, q in itertools.product(GRID_LR, GRID_STEPS, GRID_QUANTILE):
-        fr, ad = tent(vmodel, val_window, device, lr, steps, q)
-        rec = ad - fr; tuning.append(((lr, steps, q), rec))
-        print(f"{lr:>7.0e} {steps:>6} {q:>6.1f} | {fr:>7.4f} {ad:>7.4f} {rec*100:>+6.2f}p")
-    best_cfg, best_rec = max(tuning, key=lambda t: t[1])
-    print(f"\nBEST on W-46: lr={best_cfg[0]:.0e} steps={best_cfg[1]} "
-          f"quant={best_cfg[2]} (recovered {best_rec*100:+.2f}p on W-46)")
-    print("  ^ this config is now FROZEN. W-47 played no part in choosing it.\n")
 
-    # ---------- 2. PROBE W-47 capacity, then REPORT with frozen config ----------
-    print(f"=== PROBING {TEST_WEEK} capacity (data-only, no model calls) ===")
-    tmodel, tloader, device = build(args.size, TEST_WEEK)
-    probe_cap = TARGET_TEST_EVAL_BATCHES * REPEATS + 50
-    n_avail = count_available_batches(tloader, cap=probe_cap)
-    hit_cap = (n_avail >= probe_cap)
-    print(f"  W-47 loader has {'>=' if hit_cap else ''}{n_avail} batches available "
-          f"(probed up to cap={probe_cap})")
+    # Single pass: walk the loader once, evaluating PROBE_N-batch windows at
+    # geometric-ish offsets as we encounter them (avoids re-walking per offset).
+    offsets = [0, 200, 400, 700, 1000, 1400, 1800]
+    offsets = [o for o in offsets if o + PROBE_N <= args.cap]
+    targets = {o: [] for o in offsets}
+    week_res = results.get(args.week, {})
 
-    test_eval_batches = min(TARGET_TEST_EVAL_BATCHES, n_avail // REPEATS)
-    if test_eval_batches < MIN_TEST_EVAL_BATCHES:
-        print(f"  [STOP] Only {test_eval_batches} batches/repeat available "
-              f"(< floor of {MIN_TEST_EVAL_BATCHES}). Try a larger --size split.")
-        sys.exit(1)
-    if test_eval_batches < TARGET_TEST_EVAL_BATCHES:
-        print(f"  [NOTE] Target was {TARGET_TEST_EVAL_BATCHES}/repeat; W-47 only "
-              f"supports {test_eval_batches}/repeat for {REPEATS} non-overlapping "
-              f"slices. Using {test_eval_batches}.")
-    else:
-        print(f"  Using EVAL_BATCHES={test_eval_batches}/repeat (target met).")
+    n_seen = 0
+    for b in loader:
+        for o in offsets:
+            if str(o) not in week_res and o <= n_seen < o + PROBE_N:
+                targets[o].append(b)
+        n_seen += 1
+        if n_seen >= args.cap:
+            break
+    print(f"  walked {n_seen} batches (cap {args.cap})")
 
-    # Rebuild the W-47 loader fresh -- it was consumed by the capacity probe.
-    tmodel, tloader, device = build(args.size, TEST_WEEK)
+    for o in offsets:
+        key = str(o)
+        if key in week_res:
+            print(f"  offset {o:>5}: acc = {week_res[key]:.4f}  [cached]")
+            continue
+        if len(targets[o]) < PROBE_N:
+            print(f"  offset {o:>5}: only {len(targets[o])} batches available, skipping")
+            continue
+        a = accuracy_on_batches(model, targets[o], device)
+        week_res[key] = float(a)
+        results[args.week] = week_res
+        with open(OUT_JSON, "w") as f: json.dump(results, f, indent=1)
+        print(f"  offset {o:>5}: acc = {a:.4f}   "
+              f"(flows ~{o*BATCH:,} to ~{(o+PROBE_N)*BATCH:,})")
 
-    print(f"\n=== REPORTING on {TEST_WEEK} (test, frozen config) ===")
-    windows = []
-    for r in range(REPEATS):
-        w = collect_window(tloader, skip=r*test_eval_batches, n=test_eval_batches,
-                            label=f"repeat {r+1} window")
-        windows.append(w)
-
-    tbase_check = accuracy_on_batches(tmodel, windows[0], device)
-    print(f"W-47 baseline self-check: frozen acc = {tbase_check:.4f}  "
-          f"(n={test_eval_batches}, repeat-1 window)")
-    if not (0.62 <= tbase_check <= 0.78):
-        print("  [STOP] W-47 baseline out of range; wiring off. Not trusting result.")
-        sys.exit(1)
-
-    lr, steps, q = best_cfg
-    bases, recs = [], []
-    for r in range(REPEATS):
-        fr, ad = tent(tmodel, windows[r], device, lr, steps, q)
-        bases.append(fr); recs.append(ad - fr)
-        print(f"  repeat {r+1} (n={test_eval_batches}, skip={r*test_eval_batches}, "
-              f"adapt+eval on SAME window): frozen={fr:.4f} adapted={ad:.4f} "
-              f"recovery={(ad-fr)*100:+.2f}p")
-
-    base_m = float(np.mean(bases)); base_s = float(np.std(bases))
-    rec_m, rec_s = float(np.mean(recs)), float(np.std(recs))
-    gap = IN_PERIOD - base_m; low = rec_m - rec_s
-    print(f"\n==== LEAKAGE-CLEAN RESULT (widened + window-aligned, n={test_eval_batches}/repeat) ====")
-    print(f"  config tuned on W-46, reported on W-47 (never peeked)")
-    print(f"  W-47 frozen acc = {base_m:.4f} ± {base_s:.4f}  (gap {gap:.4f})")
-    print(f"  recovery = {rec_m*100:+.2f}p ± {rec_s*100:.2f} ({rec_m/gap:.1%} of gap)")
-    print(f"  conservative (mean-1sd) = {low*100:+.2f}p ({low/gap:.1%} of gap)")
-    if low < 0.03:
-        print("  -> FRAGILE once leakage removed. Reconsider before writing.")
-    else:
-        print("  -> HOLDS leakage-clean. This is the number for the paper.")
-        print("     Next: seed/adaptation-ordering variation for final error bars.")
+    accs = [week_res[str(o)] for o in offsets if str(o) in week_res]
+    if len(accs) >= 3:
+        print("\n=== READING ===")
+        drop = max(accs) - min(accs)
+        print(f"  trace: {', '.join(f'{a:.3f}' for a in accs)}  (max-min = {drop:.3f})")
+        if drop >= 0.05 and accs.index(min(accs)) > accs.index(max(accs)):
+            print("  Accuracy DECLINES with depth -> time-ordered loader + intra-week")
+            print("  event supported. Early-week accuracy is the pre-shift reference.")
+        elif drop < 0.02:
+            print("  Trace is FLAT -> the time-ordering/mid-week-event hypothesis is")
+            print("  NOT supported at this depth. Do not adopt 0.9552 as denominator")
+            print("  yet; check datazoo test-loader ordering semantics, or increase")
+            print("  --cap if the split is much larger than the walked depth.")
+        else:
+            print("  Trace is intermediate/noisy; reported for completeness.")
 
 
 if __name__ == "__main__":
