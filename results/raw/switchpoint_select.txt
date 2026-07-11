@@ -1,0 +1,43 @@
+=== PRE-REGISTERED SWITCH-POINT SELECTION on W-2022-46 ===
+    grid=[25, 37, 50, 62, 75]  K=5  (W-47 NOT touched)
+
+device=cpu
+W-46 frozen acc = 0.7535 (n=60)
+
+  [1/25] switch=25 ord 1: frozen=0.7535 adapted=0.8006 rec=+4.71p (elapsed 8.0m)
+  [2/25] switch=25 ord 2: frozen=0.7535 adapted=0.8021 rec=+4.86p (elapsed 16.0m)
+  [3/25] switch=25 ord 3: frozen=0.7535 adapted=0.8073 rec=+5.38p (elapsed 24.1m)
+  [4/25] switch=25 ord 4: frozen=0.7535 adapted=0.8059 rec=+5.24p (elapsed 32.2m)
+  [5/25] switch=25 ord 5: frozen=0.7535 adapted=0.8071 rec=+5.37p (elapsed 40.3m)
+  [6/25] switch=37 ord 1: frozen=0.7535 adapted=0.7975 rec=+4.40p (elapsed 48.3m)
+  [7/25] switch=37 ord 2: frozen=0.7535 adapted=0.7930 rec=+3.95p (elapsed 56.3m)
+  [8/25] switch=37 ord 3: frozen=0.7535 adapted=0.7881 rec=+3.47p (elapsed 64.2m)
+  [9/25] switch=37 ord 4: frozen=0.7535 adapted=0.7930 rec=+3.95p (elapsed 72.1m)
+  [10/25] switch=37 ord 5: frozen=0.7535 adapted=0.7946 rec=+4.11p (elapsed 80.1m)
+  [11/25] switch=50 ord 1: frozen=0.7535 adapted=0.7904 rec=+3.69p (elapsed 88.0m)
+  [12/25] switch=50 ord 2: frozen=0.7535 adapted=0.7897 rec=+3.62p (elapsed 95.8m)
+  [13/25] switch=50 ord 3: frozen=0.7535 adapted=0.7854 rec=+3.20p (elapsed 103.8m)
+  [14/25] switch=50 ord 4: frozen=0.7535 adapted=0.7868 rec=+3.34p (elapsed 111.7m)
+  [15/25] switch=50 ord 5: frozen=0.7535 adapted=0.7878 rec=+3.43p (elapsed 119.7m)
+  [16/25] switch=62 ord 1: frozen=0.7535 adapted=0.7407 rec=-1.28p (elapsed 127.6m)
+  [17/25] switch=62 ord 2: frozen=0.7535 adapted=0.7872 rec=+3.37p (elapsed 135.7m)
+  [18/25] switch=62 ord 3: frozen=0.7535 adapted=0.7845 rec=+3.10p (elapsed 143.8m)
+  [19/25] switch=62 ord 4: frozen=0.7535 adapted=0.7865 rec=+3.31p (elapsed 151.8m)
+  [20/25] switch=62 ord 5: frozen=0.7535 adapted=0.7910 rec=+3.75p (elapsed 159.8m)
+  [21/25] switch=75 ord 1: frozen=0.7535 adapted=0.7774 rec=+2.39p (elapsed 167.7m)
+  [22/25] switch=75 ord 2: frozen=0.7535 adapted=0.7422 rec=-1.13p (elapsed 175.7m)
+  [23/25] switch=75 ord 3: frozen=0.7535 adapted=0.7856 rec=+3.21p (elapsed 183.8m)
+  [24/25] switch=75 ord 4: frozen=0.7535 adapted=0.7862 rec=+3.27p (elapsed 191.9m)
+  [25/25] switch=75 ord 5: frozen=0.7535 adapted=0.7875 rec=+3.40p (elapsed 199.8m)
+
+==== W-46 SELECTION TABLE (pooled over K=5) ====
+  pure-50 reference (clean grid): +2.68p
+
+  switch     mean     std             per-ordering (p)
+      25   +5.11    0.27   +4.71 +4.86 +5.38 +5.24 +5.37
+      37   +3.98    0.30   +4.40 +3.95 +3.47 +3.95 +4.11
+      50   +3.46    0.18   +3.69 +3.62 +3.20 +3.34 +3.43
+      62   +2.45    1.88   -1.28 +3.37 +3.10 +3.31 +3.75
+      75   +2.23    1.72   +2.39 -1.13 +3.21 +3.27 +3.40
+
+==== SELECTED s* = 25  (W-46 pooled +5.11p +- 0.27) ====
