@@ -1,11 +1,18 @@
-# RESULTS — Test-Time Adaptation Under Abrupt Temporal Drift in Encrypted QUIC Traffic Classification
+# RESULTS: Test-Time Adaptation Under Abrupt Temporal Drift in Encrypted QUIC Traffic Classification
 
-**Status: CANONICAL (v2, 2026-07-04).** This file supersedes all previous
+This file supersedes all previous
 versions. Every number in Sections 1–6 was produced by the final-evaluation
 pipeline in one pinned environment (`requirements-lock.txt`: Python 3.12,
 torch 2.12.1, numpy 2.5.0, scikit-learn 1.9.0, cesnet-datazoo 0.2.0,
 cesnet-models 0.4.1; CPU). Section 7 records superseded results and the
 mechanisms of their corruption. Section 8 records the provenance chain.
+
+The two-phase schedule of §6 was submitted to a
+pre-registered switch-point selection (§10) and **REJECTED** on the
+pre-committed ordering-stability rule. §6 is retained but reclassified from
+"post-hoc observation / future work" to **rejected candidate**. The coarse
+W-46 switch-point probe in §9 is superseded by the pre-registered selection
+in §10.
 
 ---
 
@@ -56,7 +63,7 @@ primary throughout.
 | Condition | Recovery (points) | % of gap | Per-window | Order-std |
 |---|---|---|---|---|
 | BN-statistics recalibration only (no gradients) | **+2.43 ± 0.15** | 10.7% | +2.64 / +2.35 / +2.31 | 0.03p |
-| + filtered entropy gradients (q = 0.5) — **headline** | **+3.06 ± 0.27** | 13.5% | +3.42 / +2.95 / +2.81 | 0.06p |
+| + filtered entropy gradients (q = 0.5), **headline** | **+3.06 ± 0.27** | 13.5% | +3.42 / +2.95 / +2.81 | 0.06p |
 | + unfiltered entropy gradients (q = 1.0) | **+1.32 ± 0.53** | 5.8% | +1.99 / +1.18 / +0.78 | 0.14p |
 
 (Headline: K=5×3=15 orderings; controls: K=3×3=9. Std is over pooled
@@ -134,7 +141,7 @@ test loading. This (a) validates early-W-45 as the pre-shift reference,
 (c) provides the drift figure. The full cliff to ~0.73 lies beyond the
 walked depth; not required for the reference definition.
 
-## 6. Post-hoc observation: two-phase "hybrid" schedule
+## 6. REJECTED CANDIDATE: two-phase "hybrid" schedule
 
 Deliberate reimplementation (script 09) of the schedule discovered during
 the forensic audit (§7.1): 50 steps standard filtered TENT (stats
@@ -150,12 +157,20 @@ Lift over the pure-50 headline: **+1.25p** (Welch t=7.00, p≈2e-5;
 per-window consistent). Interpretation consistent with §2: recalibrate
 statistics early, then freeze them; filtered affine refinement continues
 to help on frozen statistics, while continued statistic updates past
-convergence slightly hurt. **Framing rules:** post-hoc observation; the
-switch point (50) is an artifact of the discovery, never tuned; ordering
-sensitivity is elevated (0.19p) and a natural-order interaction
-(+5.62p, window 1, single run) remains unexplained and unreported beyond
-this note; switch-point tuning and the ordering interaction are future
-work. This is NOT the paper's method.
+convergence slightly hurt.
+
+**STATUS (v3): REJECTED.** The switch point (50) was an artifact of the
+discovery and was never tuned, and the schedule showed elevated ordering
+sensitivity (0.19p, ~3x the pure method's 0.06p) plus an unexplained
+natural-order interaction (+5.62p, window 1, single run). Rather than
+adopt it on the strength of an appealing number, the schedule was put
+through a **pre-registered switch-point selection (§10)**. It **failed
+the pre-committed ordering-stability kill rule at selection time on the
+tuning week**, and per the pre-registration **no W-47 confirmatory run
+was performed**. The +4.31p figure in the table above is therefore a
+favorable single-configuration draw from a high-variance procedure, not
+a stable capability. This is NOT the paper's method, and it is not
+offered as a method at all. See §10.
 
 ## 7. Correction record (superseded results and mechanisms)
 
@@ -164,7 +179,7 @@ work. This is NOT the paper's method.
 The pipeline's mid-trajectory accuracy probe (every 50 steps)
 called `model.eval()` and never restored train mode. For steps=100
 configs, steps 51–100 therefore ran a *different algorithm* (affine-only
-adaptation on frozen BN statistics) — an undocumented two-phase hybrid
+adaptation on frozen BN statistics), an undocumented two-phase hybrid
 created by the measurement itself. The archived headline numbers are
 real measurements of that hybrid (verified: reconstructed k=0
 trajectories reproduce archived per-window envelopes, and window 3's
@@ -214,8 +229,8 @@ frozen config changed to steps=50. It remains cited in §2 finding 4.
    headline run (02) and the collapse check (05), which recomputes
    accuracy from raw predictions through an independent code path.
 3. The leakage demo (08) reproduced, from single reconstructed
-   trajectories, the archived per-window K=8 envelopes — including
-   window 3's archived minimum to printed precision — while its acc@50
+   trajectories, the archived per-window K=8 envelopes, including
+   window 3's archived minimum to printed precision, while its acc@50
    values are bit-identical to the clean steps=50 runs, tying old and
    new vintages to one verified mechanism.
 4. The hybrid run's (09) k=0 anchors reproduce the demo trajectories to
@@ -225,6 +240,16 @@ frozen config changed to steps=50. It remains cited in §2 finding 4.
 6. Environment pinned in `requirements-lock.txt`; all numbers from one
    environment; within-process bit-determinism audited (see
    diagnostics/).
+7. **(v3)** The pre-registered selection (§10) ran in the same pinned
+   environment: its W-46 frozen accuracy is bit-identical
+   (`0.7534749349`) across all 25 units, confirming the frozen model was
+   never perturbed across the switch-point grid and that its recoveries
+   are comparable to §2. The pre-registration was hash-locked
+   (SHA-256 `4ebd14fb…712e45`) and committed **before** the run, so the
+   "selected before the report week was touched" claim is verifiable
+   rather than asserted. The kill rule fired at selection time; **no
+   W-47 number was generated**, which is itself the strongest available
+   guarantee that the report week did not inform the rejection.
 
 ## 9. Calibration and robustness experiments (v2.1, 2026-07-05)
 
@@ -241,19 +266,109 @@ All under the pinned environment, final-eval, same protocol.
   filtered gradient effect at 100 steps becomes +0.73 p.
 - **Switch-point probe, W-46 only** (script 11, natural order):
   freeze@25 +3.69 p, freeze@50 +3.88 p, freeze@75 +2.76 p, pure-100
-  +0.46 p (pure-50 reference +2.68 p). Early-to-mid freezing is what
-  matters; the benefit is not knife-edged at the accidental value.
-  W-47 untouched; leakage-clean status of all reported numbers intact.
+  +0.46 p (pure-50 reference +2.68 p). W-47 untouched.
+  **SUPERSEDED by §10.** This probe used a single natural ordering and no
+  error bars, so it could not see the ordering instability that the
+  pre-registered selection (§10, K=5 orderings) later exposed. Its
+  reading ("early-to-mid freezing is what matters") is consistent with
+  the §10 means but misleading in isolation: the early switch points that
+  look best by mean are precisely the least stable. Retained as the
+  motivating observation, not as evidence.
 - **W-47 depth trace** (script 07 --week W-2022-47): trendless scatter
   0.709--0.752 (range 0.042, no monotone component) at the same
   offsets where W-45 declines monotonically, ruling out within-week
   composition as the driver of the W-45 trend.
 
-## 10. Raw artifacts
+## 10. Pre-registered switch-point selection (v3, 2026-07-11): NEGATIVE
 
+**Pre-registration:** `PREREGISTRATION_switchpoint.md`, committed to the
+repository and hash-locked **before any W-47 evaluation of a tuned switch
+point existed**. SHA-256:
+`4ebd14fbe8b721e9bb86683febd724b4ba7b08fb8a2d7c83a7444c37f9712e45`.
+Script: `11_switchpoint_select.py`. Raw: `switchpoint_select.json`.
+
+**Design (all fixed in advance, no discretion):**
+- Selection on **W-2022-46 only**. W-2022-47 not touched.
+- Grid: switch ∈ {25, 37, 50, 62, 75} of 100 total steps (finer than the
+  §9 probe, so the selected point is not forced onto the accidental 50).
+- **K = 5 seeded orderings** per switch point, `default_rng(1000*0 + k)`,
+  so ordering stability is measurable **at selection time**, the only way
+  the stability rule can fire without consulting the report week.
+- lr = 1e-3, q = 0.5, BN momentum = 0.1 (frozen config, unchanged).
+- **Selection rule:** highest pooled mean recovery on W-46; ties within
+  0.05p break toward the **earlier** (cheaper) switch point.
+
+**Kill rules, committed before the run:**
+- **A (stability, on W-46 at selection):** if the selected switch point's
+  within-window order-std > **0.12p** (~2x the pure method's 0.06p),
+  reject outright and **do not run the W-47 confirmatory**.
+- **B (magnitude, on W-47, only if A passes):** confirmatory recovery must
+  exceed **+3.66p** (> +0.60p over the pure +3.06p headline) to promote.
+- **C (stability on W-47):** order-std > 0.12p, or reappearance of the
+  unexplained +5.62p window-1 interaction, disqualifies regardless of mean.
+- Promotion required **A ∧ B ∧ C**. No partial credit, no override.
+
+**Environment check:** W-46 frozen accuracy = **0.7535** across all 25
+units, bit-identical (`0.7534749349`), matching the recorded baseline.
+Environment consistent with the rest of the pipeline; recoveries are
+comparable to §2 numbers.
+
+**Selection outcome (W-2022-46, K=5, recovery in points):**
+
+| Switch | Mean | Order-std | Per-ordering |
+|---|---|---|---|
+| **25** | **+5.11** | **0.27** | +4.71 / +4.86 / +5.38 / +5.24 / +5.37 |
+| 37 | +3.98 | 0.30 | +4.40 / +3.95 / +3.47 / +3.95 / +4.11 |
+| 50 | +3.46 | 0.18 | +3.69 / +3.62 / +3.20 / +3.34 / +3.43 |
+| 62 | +2.45 | 1.88 | **−1.28** / +3.37 / +3.10 / +3.31 / +3.75 |
+| 75 | +2.23 | 1.72 | +2.39 / **−1.13** / +3.21 / +3.27 / +3.40 |
+
+(pure-50 reference on the same clean W-46 grid: +2.68p)
+
+**Deterministic selection → s\* = 25** (highest pooled mean, +5.11p).
+
+**KILL RULE A: FAIL.** s\* = 25 has order-std **0.27p > 0.12p ceiling**.
+Per the pre-registration: **STOP. The W-47 confirmatory was NOT run.** The
+two-phase schedule is a **rejected candidate**, not a method. No
+report-week number exists for any tuned switch point.
+
+**Findings:**
+
+1. **Lift and instability are the same phenomenon.** Mean recovery rises as
+   the freeze moves earlier, and ordering instability rises with it and
+   faster. No switch point on the grid delivers both a lift over the pure
+   method (+3.06p) and pure-method-class stability (0.06p).
+2. **Late freezes can be actively harmful.** Switch 62 and 75 each contain
+   a single ordering that drives accuracy **below the frozen baseline**
+   (−1.28p, −1.13p; verified in the raw JSON, not a display artifact). A
+   method that can underperform doing nothing is not deployable.
+3. **The only stable point is marginal.** Switch 50 is the sole
+   configuration with near-pure-method stability (0.18p) and it yields
+   +3.46p on W-46, barely above the pure method. Even it exceeds the
+   0.12p ceiling.
+4. **The archived +4.31p (§6) is explained.** It was a favorable draw from
+   a high-variance procedure under a single ordering, not a stable
+   capability. Multi-ordering evaluation dissolves it.
+5. **The protocol earned its keep.** A single-ordering evaluation would
+   have reported the schedule as a method beating the tuned baseline by
+   >1 point. The pre-registered stability criterion instead rejected it,
+   on the tuning week, before the report week was ever consulted.
+
+**Interpretation for the manuscript:** this is reported as a negative
+result. The value is that the evaluation discipline converted an appealing
+number into a correct rejection. Whether some stabilized variant of a
+two-phase schedule could pass the same criterion is left open; the
+schedule as tested does not.
+
+## 11. Raw artifacts
+
+- Clean (v3): `PREREGISTRATION_switchpoint.md` (hash-locked, SHA-256
+  `4ebd14fb…712e45`), `11_switchpoint_select.py`,
+  `switchpoint_select.json` (25 units, K=5 x 5 switch points, W-46 only).
 - Clean (v2.1): `oracle_ceiling.txt` + `oracle_matched_progress.json`,
   `filtered100_errorbars.txt` + `filtered100_progress.json`,
-  `switchpoint_probe.txt` + `.json`, `w45_depth_probe.txt` + `.json`
+  `switchpoint_probe.txt` + `.json` (coarse probe; superseded by §10 but
+  retained as the motivating observation), `w45_depth_probe.txt` + `.json`
   (now with the W-2022-47 key).
 - Clean: `headline_K8_final_eval.txt` (K=5), `errorbars_progress.json`,
   `mechanism_steps50_run.txt` + JSON, `bnstats_steps50_run.txt` + JSON,
