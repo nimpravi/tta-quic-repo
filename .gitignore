@@ -23,5 +23,9 @@ tent-env/
 
 # local run outputs not meant for the record
 manuscript/
+manuscript_cl/
+manuscript-nl/
 cover letter/
 data/
+*.zip
+*.txt

@@ -27,6 +27,7 @@ Run:
 """
 import argparse, sys, os, json
 import numpy as np
+from tta_guards import guarded_eval, assert_anchor  # state-audit protocol
 
 DATA_DIR   = "./data/CESNET-QUIC22/"
 MODEL_DIR  = "./models/"
@@ -110,12 +111,17 @@ def collect_window(loader, skip, n, label=""):
 def accuracy_on_batches(model, batches, device):
     import torch
     from sklearn.metrics import accuracy_score
-    model.eval(); ys, ps = [], []
-    with torch.no_grad():
-        for b in batches:
-            lo, y = fwd(model, b, device)
-            ps.append(lo.argmax(1).cpu().numpy()); ys.append(y)
-    return accuracy_score(np.concatenate(ys), np.concatenate(ps))
+    def _run():
+        was = {n: mod.training for n, mod in model.named_modules()}
+        model.eval(); ys, ps = [], []
+        with torch.no_grad():
+            for b in batches:
+                lo, y = fwd(model, b, device)
+                ps.append(lo.argmax(1).cpu().numpy()); ys.append(y)
+        for n, mod in model.named_modules():
+            mod.train(was[n])
+        return accuracy_score(np.concatenate(ys), np.concatenate(ps))
+    return guarded_eval(model, _run)
 
 
 def main():

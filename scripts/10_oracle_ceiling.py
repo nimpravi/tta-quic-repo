@@ -33,6 +33,7 @@ Checkpoints: oracle_matched_progress.json / oracle_full_progress.json
 """
 import argparse, copy, sys, os, json, time
 import numpy as np
+from tta_guards import guarded_eval, assert_anchor  # state-audit protocol
 
 DATA_DIR   = "./data/CESNET-QUIC22/"
 MODEL_DIR  = "./models/"
@@ -119,12 +120,17 @@ def collect_window(loader, skip, n, label=""):
 def accuracy_on_batches(model, batches, device):
     import torch
     from sklearn.metrics import accuracy_score
-    model.eval(); ys, ps = [], []
-    with torch.no_grad():
-        for b in batches:
-            lo, y = fwd(model, b, device)
-            ps.append(lo.argmax(1).cpu().numpy()); ys.append(y)
-    return accuracy_score(np.concatenate(ys), np.concatenate(ps))
+    def _run():
+        was = {n: mod.training for n, mod in model.named_modules()}
+        model.eval(); ys, ps = [], []
+        with torch.no_grad():
+            for b in batches:
+                lo, y = fwd(model, b, device)
+                ps.append(lo.argmax(1).cpu().numpy()); ys.append(y)
+        for n, mod in model.named_modules():
+            mod.train(was[n])
+        return accuracy_score(np.concatenate(ys), np.concatenate(ps))
+    return guarded_eval(model, _run)
 
 
 def oracle_finetune(base_model, window_batches, device, order, full):
@@ -195,6 +201,7 @@ def main():
                for r in range(REPEATS)]
     tbase = accuracy_on_batches(tmodel, windows[0], device)
     print(f"W-47 self-check (window 1) = {tbase:.4f}")
+    assert_anchor(tbase, 0.72239013671875, tol=0.0, name="W-47 window 1 frozen")
     if not (0.62 <= tbase <= 0.78):
         print("  [STOP] baseline out of range."); sys.exit(1)
 

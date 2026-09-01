@@ -26,6 +26,7 @@ Output: switchpoint_select.json + console. Resumable.
 """
 import argparse, copy, sys, os, json, time
 import numpy as np
+from tta_guards import guarded_eval, assert_anchor  # state-audit protocol
 
 DATA_DIR   = "./data/CESNET-QUIC22/"
 MODEL_DIR  = "./models/"
@@ -106,12 +107,17 @@ def collect_window(loader, skip, n):
 def accuracy_on_batches(model, batches, device):
     import torch
     from sklearn.metrics import accuracy_score
-    model.eval(); ys, ps = [], []
-    with torch.no_grad():
-        for b in batches:
-            lo, y = fwd(model, b, device)
-            ps.append(lo.argmax(1).cpu().numpy()); ys.append(y)
-    return accuracy_score(np.concatenate(ys), np.concatenate(ps))
+    def _run():
+        was = {n: mod.training for n, mod in model.named_modules()}
+        model.eval(); ys, ps = [], []
+        with torch.no_grad():
+            for b in batches:
+                lo, y = fwd(model, b, device)
+                ps.append(lo.argmax(1).cpu().numpy()); ys.append(y)
+        for n, mod in model.named_modules():
+            mod.train(was[n])
+        return accuracy_score(np.concatenate(ys), np.concatenate(ps))
+    return guarded_eval(model, _run)
 
 
 def two_phase(base_model, window_batches, device, switch, order):
@@ -158,6 +164,7 @@ def main():
     w = collect_window(vloader, skip=0, n=TUNE_EVAL_BATCHES)
     vbase = accuracy_on_batches(vmodel, w, device)
     print(f"W-46 frozen acc = {vbase:.4f} (n={len(w)})\n")
+    assert_anchor(vbase, 0.7534749348958333, tol=0.0, name="W-46 60-batch frozen")
 
     total = len(SWITCHES) * K
     t0 = time.time(); done = 0
