@@ -16,42 +16,83 @@ classifier meets a real, documented distribution shift.
 ## TL;DR
 
 A public QUIC classifier (MM-CESNET-V2, trained on week W-2022-44 of
-CESNET-QUIC22) loses **22.65 accuracy points** when Google changed its
-TLS certificates mid-week W-45. Under a leakage-clean protocol (all
-hyperparameters frozen on W-46 before W-47 is touched):
+CESNET-QUIC22) loses **22.65 accuracy points** when Google changed its TLS
+certificates mid-week W-45. This repository measures what label-free
+test-time adaptation recovers, what it costs, and how it compares to the
+alternative an operator actually has.
 
-| Condition (steps = 50) | Recovery | % of gap |
+Under a leakage-clean protocol with all hyperparameters frozen on W-46 before
+W-47 is touched:
+
+| Condition (episodic, 50 steps) | Recovery | % of gap |
 |---|---|---|
-| BN-statistics recalibration only (no gradients) | **+2.43 ± 0.15 p** | 10.7% |
-| + filtered entropy gradients (q = 0.5), headline | **+3.06 ± 0.27 p** | 13.5% |
+| BN-statistics recalibration only | **+2.43 ± 0.15 p** | 10.7% |
+| + filtered entropy gradients (q = 0.5) | **+3.06 ± 0.27 p** | 13.5% |
 | + unfiltered entropy gradients (q = 1.0) | **+1.32 ± 0.53 p** | 5.8% |
-| Two-phase schedule (post-hoc observation) | **+4.31 ± 0.49 p** | 19.0% |
 
-Findings: recalibration alone carries ~4/5 of the recovery; entropy
-filtering gates the **sign** of the gradient contribution (+0.62 p
-filtered vs −1.12 p unfiltered, relative to stats-only); no
-class-collapse signature (macro-F1 flat, all 102 classes retained);
-recovery is nearly insensitive to batch ordering.
+**That +3.06 is a net of two large opposing effects.** Split by whether a
+class was affected by the certificate change, it is a gain of about **+6.9
+points on drifted traffic** and a loss of **2.8 points on traffic that did
+not drift**. Below roughly **29 percent** drift prevalence, adaptation makes
+the classifier worse overall, and prevalence cannot be measured without the
+labels the method exists to avoid needing.
+
+**Supervised retraining on stale labels does four to five times better.**
+Retraining on labels 1, 3 or 7 days old recovers **+11.07 to +14.72 points**,
+at every delay tested, and does three to seven times less damage to
+non-drifted traffic. A pre-registered kill rule fired on this comparison. The
+value of label-free adaptation is confined to the interval between drift
+onset and the arrival of the first post-drift labels.
+
+Other findings:
+
+- Strict causality is nearly free. Streaming, with no buffering and every
+  flow classified before the model has seen it, recovers +2.88 points on the
+  three report windows and +2.63 over a full week of 6.6 million flows.
+- Entropy filtering does not improve recovery on drifted traffic. It makes it
+  slightly worse. Its entire benefit is limiting collateral damage.
+- Do not stack adaptation on a freshly retrained model. It hurt in all nine
+  conditions tested.
+- The headline holds across seven days (+3.04 ± 0.24), not just the one day
+  the original three windows turned out to occupy.
+
+Full numbers, kill-rule outcomes and the correction record:
+[`results/RESULTS.md`](results/RESULTS.md).
+
+---
 
 ## The self-audit (read this if you run TTA experiments)
 
-An early version of this pipeline probed accuracy every 50 steps. The
-probe called `model.eval()` and never restored training mode, so from
-step 51 onward BN statistics froze and a **different algorithm** ran,
-an undocumented two-phase hybrid created by the measurement itself. It
-inflated the headline by over a point, corrupted hyperparameter
-selection, and manufactured a spurious ordering effect. Bit-level
-provenance tracking (frozen accuracies are exact dyadic rationals)
-made the distortion detectable, diagnosable, and correctable. The full
-mechanism, the falsification test that confirmed it, and every
-superseded number with its cause are recorded in
-[`results/RESULTS.md`](results/RESULTS.md) (Sections 7–8)
+An early version of this pipeline probed accuracy every 50 steps. The probe
+called `model.eval()` and never restored training mode, so from step 51
+onward BN statistics froze and a **different algorithm** ran, an undocumented
+two-phase hybrid created by the measurement itself. It inflated the headline
+by over a point, corrupted hyperparameter selection, and manufactured a
+spurious ordering effect. Bit-level provenance tracking made the distortion
+detectable, diagnosable and correctable. Every superseded number is retained
+with its cause attached in [`results/RESULTS.md`](results/RESULTS.md)
+sections 7 and 8.
 
-Practical rules that fell out of this: evaluate once, at the final
-step; never let an evaluation touch a model that will continue
-adapting; pin your environment (`requirements-lock.txt`); TTA changes
-model state by design, so measurements become interventions very
-easily.
+`scripts/tta_guards.py` ships the safeguard as infrastructure: every
+evaluation in scripts 02 to 21 is wrapped in `guarded_eval`, which snapshots
+each module's training flag and a checksum of every BN buffer and parameter
+before the evaluation and asserts them unchanged after, and recorded
+bit-level anchors are asserted at runtime. Rerunning script 06 under the
+guards reproduces the recorded accuracies bit for bit.
+
+Practical rules that fell out of this: evaluate once, at the final step;
+never let an evaluation touch a model that will continue adapting; pin your
+environment; and check what your headline number is a net of, because a
+collapse check will not tell you.
+
+**Known limitation.** The pipeline is bit-deterministic within a process for
+every condition except the full-network fine-tune of Experiment B, which is
+the only one that puts the whole model in training mode and therefore
+activates its three dropout layers. Torch's global RNG is not seeded. Two
+independent runs of that condition differ by 0.014 to 0.133 points; both are
+released.
+
+---
 
 ## Repository layout
 
@@ -60,39 +101,115 @@ easily.
 ├── README.md
 ├── LICENSE
 ├── CITATION.cff
-├── CHANGELOG.md                 # correction record (summary)
-├── requirements.txt             # loose, human-readable
-├── requirements-lock.txt        # exact pins; canonical environment
-├── scripts/                     # numbered pipeline, run in order below
-│   ├── 02_errorbars.py          # headline: tune on W-46, report on W-47
-│   ├── 03_mechanism_errorbars.py# unfiltered (q=1.0) control
-│   ├── 04_bnstats_control.py    # stats-only matched control
-│   ├── 05_collapse_check.py     # macro-F1 / class-collapse diagnostics
-│   ├── 06_inperiod_reference.py # self-measured gap denominator
-│   ├── 07_w45_depth_probe.py    # intra-week drift onset trace
-│   ├── 08_leakage_demo.py       # falsification test for the audit finding
-│   ├── 09_hybrid_schedule.py    # deliberate two-phase reimplementation
-│   ├── 10_oracle_ceiling.py     # labeled-oracle ceiling (matched capacity)
-│   ├── 11_switchpoint_probe.py  # switch-point sensitivity (tuning week only)
-│   ├── 12_filtered100_errorbars.py # Table II symmetry fill (K=3 at 100 steps)
-│   └── tta_guards.py            # state-audit guards: guarded_eval, anchors
-├── legacy/                      # superseded scripts, kept as evidence
+├── CHANGELOG.md                       # correction record, v1 to v4 (summary)
+├── requirements.txt                   # loose, human-readable
+├── requirements-lock.txt              # exact environment that produced the results
+│
+├── PREREGISTRATION_switchpoint.md     # governs the switch-point selection
+│                                      #   SHA-256 4ebd14fb…712e45, locked BEFORE its run
+├── PREREGISTRATION_streaming_delayed_label.md
+│                                      # governs experiments A to E
+│                                      #   section 0.1 records which families it
+│                                      #   preceded and which it did not
+│
+├── scripts/
+│   │   # v1 to v3 pipeline
+│   ├── 02_errorbars.py                # headline: tune on W-46, report on W-47
+│   ├── 03_mechanism_errorbars.py      # unfiltered (q=1.0) control
+│   ├── 04_bnstats_control.py          # stats-only matched control
+│   ├── 05_collapse_check.py           # macro-F1 and class-collapse diagnostics
+│   ├── 06_inperiod_reference.py       # self-measured gap denominator
+│   ├── 07_w45_depth_probe.py          # intra-week drift onset trace (Fig. 2)
+│   ├── 08_leakage_demo.py             # falsification test for the audit finding
+│   ├── 09_hybrid_schedule.py          # deliberate two-phase reimplementation
+│   ├── 10_oracle_ceiling.py           # matched-capacity labeled reference
+│   ├── 11_switchpoint_probe.py        # coarse probe, superseded by the selection
+│   ├── 11_switchpoint_select.py       # PRE-REGISTERED selection; kill rule A fired
+│   ├── 12_filtered100_errorbars.py    # 100-step error bars
+│   │
+│   │   # v4: experiments A to E, the post-hoc analysis, and verification
+│   ├── 13_window_trend_analysis.py    # per-window trend, reads raw JSON only
+│   ├── 14_stream_order_audit.py       # A0: ordering, period lengths, day map
+│   ├── 15_acrossday_replication.py    # Experiment E: seven days
+│   ├── 16_streaming.py                # Experiment A: --tune then --report
+│   ├── 17_delayed_label.py            # Experiment B: --tune then --report
+│   ├── 18_nondrifted_control.py       # Experiment C: --c1, --partition, --c2
+│   ├── 19_w46_stability_reference.py  # Experiment D: matched stability reference
+│   ├── 20_delayed_label_partition.py  # post-hoc partition (NOT pre-registered)
+│   ├── 21_verify_all.py               # regenerates every paper number from raw
+│   └── tta_guards.py                  # guarded_eval, assert_anchor; used by 02-21
+│
+├── legacy/                            # superseded scripts, kept as evidence
 │   └── (state-mutating-probe versions; do not use)
-├── diagnostics/                 # determinism audits, repro-unit diag
+├── diagnostics/                       # determinism audits, repro-unit diagnostics
+│
 ├── results/
-│   ├── RESULTS.md               # CANONICAL numbers + correction record
-│   ├── raw/                     # clean console logs + JSON checkpoints
-│   └── superseded/              # pre-correction artifacts, marked
-└── manuscript/                  # LaTeX source (IEEEtran), modular sections
-    ├── main.tex
-    ├── sections/*.tex
-    └── figures/                 # standalone TikZ/pgfplots figure sources + PDFs
+│   ├── RESULTS.md                     # CANONICAL numbers and correction record
+│   ├── raw/                           # console logs and JSON checkpoints (below)
+│   └── superseded/                    # pre-correction artifacts, marked with cause
+│
+└── (not tracked)
+    ├── data/                          # CESNET-QUIC22, downloaded on first use
+    ├── models/                        # MM-CESNET-V2 weights, downloaded on first use
+    └── manuscript/                    # LaTeX source; excluded by .gitignore
 ```
+
+### What is in `results/raw/`
+
+Grouped by the section of `results/RESULTS.md` each one supports.
+
+| Section | Artifacts |
+|---|---|
+| 1, gap and denominator | `inperiod_reference.json` |
+| 2 and 3, decomposition and step count | `errorbars_progress.json`, `bnstats_progress_steps50.json`, `mechanism_progress_steps50.json`, `filtered100_progress.json` |
+| 4, class-level behaviour | `collapse_check_q0.5_steps50.json` |
+| 5, ordering and period lengths | `streaming_order_audit.json`, `w45_depth_probe.json` |
+| 6, Experiment A streaming | `streaming_config.json`, `streaming_results.json` |
+| 7 and 8, audit and provenance | `leakage_demo.json`, `determinism_audit_run.txt` |
+| 9, labeled reference | `oracle_matched_progress.json` |
+| 10, switch-point selection | `switchpoint_select.json`, `switchpoint_probe.json`, `hybrid_progress.json` |
+| 11, Experiment D | `w46_stability_reference.json` |
+| 12, Experiment E | `acrossday_progress.json` |
+| 13, Experiment B delayed-label | `delayed_label_config.json`, `delayed_label_progress.json` |
+| 14, Experiment C non-drifted cost | `nondrifted_c1_progress.json`, `class_partition.json`, `class_partition.sha256`, `nondrifted_c2_progress.json` |
+| 15, post-hoc partition | `delayed_label_partition_progress.json` |
+
+Console logs for each run are in the same directory with matching names.
+
+### Two conventions worth knowing before you read the tree
+
+**Files that gate other files.** `streaming_config.json` and
+`delayed_label_config.json` are written by the `--tune` mode of their scripts
+and required by `--report`, so the report week cannot be touched before the
+configuration is selected on the tuning week. `class_partition.sha256` must
+exist and match `class_partition.json` before
+`18_nondrifted_control.py --c2` will run, so the class partition cannot be
+adjusted after a report-week number exists. These are mechanical, not
+conventions of good behaviour.
+
+**Nothing is deleted.** Superseded results stay in `results/superseded/` and
+superseded scripts stay in `legacy/`, each with the cause of its supersession
+recorded in `results/RESULTS.md` section 7. The two switch-point scripts are
+both present for the same reason: `11_switchpoint_probe.py` is the coarse
+probe that motivated the selection, and `11_switchpoint_select.py` is the
+pre-registered selection that superseded it.
 
 ## Reproducing the results
 
-**Requirements.** Python 3.12, CPU only (every number in the paper was
-produced on a 16 GB Windows laptop with no GPU). Install exact pins:
+**Verifying without running anything.** Every number in the paper is
+regenerated from the released raw artifacts by:
+
+```bash
+python scripts/21_verify_all.py
+```
+
+That script loads no model, reads no dataset, needs no GPU, and finishes in
+seconds. It reports 145 checks passed, 0 failed, 0 artifacts missing, and it
+lists by name the four artifacts it does not parse, so a pass cannot be
+mistaken for a complete check.
+
+**Requirements.** Python 3.12, CPU. Every number in the paper was produced on
+a Windows 11 laptop with no GPU.
 
 ```bash
 python -m venv tent-env
@@ -100,12 +217,25 @@ tent-env/Scripts/activate        # Windows; use bin/activate elsewhere
 pip install -r requirements-lock.txt
 ```
 
-**Data and weights.** CESNET-QUIC22 (size S) downloads on first use
-via `cesnet-datazoo` into `./data/`; MM-CESNET-V2 W-44 weights via
+`requirements-lock.txt` is the exact environment that produced the results,
+captured from it, with the interpreter and platform recorded in its header.
+`requirements.txt` is a looser, human-readable alternative.
+
+**Forcing CPU.** The scripts select CUDA automatically when it is available.
+The released numbers were produced on CPU, so to reproduce them exactly on a
+machine with a GPU:
+
+```bash
+CUDA_VISIBLE_DEVICES="" python scripts/02_errorbars.py --size S --K 5     # Linux/macOS
+set CUDA_VISIBLE_DEVICES=  && python scripts/02_errorbars.py --size S --K 5   # Windows
+```
+
+**Data and weights.** CESNET-QUIC22 (size S) downloads on first use via
+`cesnet-datazoo` into `./data/`; MM-CESNET-V2 W-44 weights via
 `cesnet-models` into `./models/`. Both are public.
 
-**Run order and cost** (from repo root, all resumable via JSON
-checkpoints):
+**Run order and cost** (from the repository root; all resumable via JSON or
+torch checkpoints). Timings are measured, not estimated.
 
 | Step | Command | ~Time (CPU) |
 |---|---|---|
@@ -116,23 +246,60 @@ checkpoints):
 | Stats-only control | `python scripts/04_bnstats_control.py --size S --K 3` | 65 min |
 | Collapse check | `python scripts/05_collapse_check.py --size S --quant 0.5` | 30 min |
 | Leakage demo | `python scripts/08_leakage_demo.py --size S` | 40 min |
-| Two-phase | `python scripts/09_hybrid_schedule.py --size S --K 3` | 1.7 h |
-| Oracle ceiling | `python scripts/10_oracle_ceiling.py --size S --K 3` | 1.5 h |
+| Two-phase (rejected) | `python scripts/09_hybrid_schedule.py --size S --K 3` | 1.7 h |
+| Labeled reference | `python scripts/10_oracle_ceiling.py --size S --K 3` | 1.5 h |
 | Switch probe | `python scripts/11_switchpoint_probe.py --size S` | 35 min |
+| Switch selection | `python scripts/11_switchpoint_select.py --size S` | 2.5 h |
 | Table II fill | `python scripts/12_filtered100_errorbars.py --size S --K 3` | 1.7 h |
+| Window trend | `python scripts/13_window_trend_analysis.py` | seconds |
+| A0 ordering audit | `python scripts/14_stream_order_audit.py --size S` | 5 min |
+| Across-day (E) | `python scripts/15_acrossday_replication.py --size S --K 3` | 3.6 h |
+| Streaming tune (A) | `python scripts/16_streaming.py --tune --size S` | 2.7 h |
+| Streaming report (A) | `python scripts/16_streaming.py --report --size S` | 5.5 h |
+| Delayed-label tune (B) | `python scripts/17_delayed_label.py --tune --size S` | ~4 h |
+| Delayed-label report (B) | `python scripts/17_delayed_label.py --report --size S` | ~8 h |
+| Non-drifted control (C1) | `python scripts/18_nondrifted_control.py --c1 --size S --K 3` | 1.6 h |
+| Class partition | `python scripts/18_nondrifted_control.py --partition --size S` | 28 min |
+| Partition report (C2) | `python scripts/18_nondrifted_control.py --c2 --size S --K 3` | ~1 h |
+| Stability reference (D) | `python scripts/19_w46_stability_reference.py --size S` | 15 min |
+| Post-hoc partition | `python scripts/20_delayed_label_partition.py --size S --combined` | 4.5 h |
+| Verify everything | `python scripts/21_verify_all.py` | seconds |
 
-Determinism note: the pipeline is bit-deterministic within a process;
-"seeds" vary the one genuine stochastic factor, the adaptation batch
-ordering (`numpy.random.default_rng(1000*window + k)`). Expected
-values, including bit-level anchors, are documented in
-`results/RESULTS.md` §8 and asserted by scripts 08–09 at runtime.
+Two steps are gated deliberately and will refuse to run out of order.
+`16_streaming.py --report` and `17_delayed_label.py --report` require the
+configuration file written by their own `--tune` mode, so the report week
+cannot be touched before the configuration is selected on the tuning week.
+`18_nondrifted_control.py --c2` requires `class_partition.sha256` to exist
+and match `class_partition.json`, so the class partition cannot be adjusted
+after a report-week number exists.
 
-## Manuscript
+**Determinism.** The pipeline is bit-deterministic within a process except as
+noted in the self-audit section. "Seeds" vary the one genuine stochastic
+factor, the adaptation batch ordering
+(`numpy.random.default_rng(1000*window + k)`). Expected values, including
+bit-level anchors, are documented in `results/RESULTS.md` and asserted at
+runtime.
 
-`manuscript/` contains the IEEEtran source targeting IEEE
-Communications Letters (4 pages compiled). Figures are TikZ/pgfplots
-drawn from the measured values; standalone versions for production are
-in `manuscript/figures/`.
+---
+
+## Manuscript and pre-registrations
+
+Two pre-registration documents govern the study and are committed with their
+SHA-256 recorded:
+
+- `PREREGISTRATION_switchpoint.md`, hash-locked **before** the switch-point
+  selection it governs.
+- `PREREGISTRATION_streaming_delayed_label.md`, hash-locked before
+  Experiments B, C and D, and after A and E. Its section 0.1 records that
+  asymmetry explicitly and states what may and may not be claimed for each
+  family.
+
+Kill rules in both documents fired and are reported as such: the switch-point
+schedule was rejected on ordering instability before the report week was
+consulted, and the delayed-label comparison triggered the framing change
+recorded in `results/RESULTS.md` section 13.
+
+The manuscript source is not tracked in this repository. See `.gitignore`.
 
 ## Citation
 

@@ -106,10 +106,22 @@ def fwd(model, batch, device):
 
 
 def count_available_batches(loader, cap):
+    """Count batches, stopping at `cap`.
+
+    The return value EQUALS `cap` whenever the cap is reached, so it is a
+    lower bound on the period length and not a measurement of it. The true
+    lengths, measured without a cap by scripts/14_stream_order_audit.py and
+    recorded in results/RESULTS.md section 5, are 2,464 batches for
+    W-2022-46 and 3,227 for W-2022-47.
+    """
     n = 0
     for _ in loader:
         n += 1
         if n >= cap: break
+    if n >= cap:
+        print(f"  [note] the batch count hit the probe cap of {cap}. The "
+              f"n_avail printed below is a LOWER BOUND, not the length of "
+              f"the period (see results/RESULTS.md section 5).")
     return n
 
 

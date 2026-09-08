@@ -44,7 +44,8 @@ from tta_guards import guarded_eval, assert_anchor  # state-audit protocol
 DATA_DIR   = "./data/CESNET-QUIC22/"
 MODEL_DIR  = "./models/"
 TRAIN_WEEK = "W-2022-44"
-BATCH      = 256
+BATCH      = 256          # train batch size; test loaders override this
+TEST_BATCH = 2048         # datazoo's test_batch_size default, what this probe sees
 OUT_JSON   = "w45_depth_probe.json"
 
 PROBE_N    = 60          # thin windows: enough signal, cheap
@@ -159,7 +160,7 @@ def main():
         results[args.week] = week_res
         with open(OUT_JSON, "w") as f: json.dump(results, f, indent=1)
         print(f"  offset {o:>5}: acc = {a:.4f}   "
-              f"(flows ~{o*BATCH:,} to ~{(o+PROBE_N)*BATCH:,})")
+              f"(flows ~{o*TEST_BATCH:,} to ~{(o+PROBE_N)*TEST_BATCH:,})")
 
     accs = [week_res[str(o)] for o in offsets if str(o) in week_res]
     if len(accs) >= 3:
