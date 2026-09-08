@@ -1,0 +1,94 @@
+{
+ "done": {
+  "w0_frozen": {
+   "affected": 0.5905237527523524,
+   "unaffected": 0.9456516736470449,
+   "n_affected": 257507,
+   "n_unaffected": 152093
+  },
+  "w0_stats_0": {
+   "affected": 0.6643314550672409,
+   "unaffected": 0.8925525829591106
+  },
+  "w0_stats_1": {
+   "affected": 0.6650498821391263,
+   "unaffected": 0.8906524297633684
+  },
+  "w0_stats_2": {
+   "affected": 0.6658343268338336,
+   "unaffected": 0.8886207780765716
+  },
+  "w0_filtered_0": {
+   "affected": 0.6625645128093606,
+   "unaffected": 0.9153807210062265
+  },
+  "w0_filtered_1": {
+   "affected": 0.663282939881246,
+   "unaffected": 0.9156568678374416
+  },
+  "w0_filtered_2": {
+   "affected": 0.6623392762138505,
+   "unaffected": 0.9137961641890159
+  },
+  "w1_frozen": {
+   "affected": 0.5901262093402875,
+   "unaffected": 0.9368995771002967,
+   "n_affected": 251170,
+   "n_unaffected": 158430
+  },
+  "w1_stats_0": {
+   "affected": 0.6562407930883465,
+   "unaffected": 0.8913274001136149
+  },
+  "w1_stats_1": {
+   "affected": 0.6573874268423777,
+   "unaffected": 0.8904374171558417
+  },
+  "w1_stats_2": {
+   "affected": 0.6594378309511486,
+   "unaffected": 0.8896926087230954
+  },
+  "w1_filtered_0": {
+   "affected": 0.6539276187442767,
+   "unaffected": 0.9118475036293632
+  },
+  "w1_filtered_1": {
+   "affected": 0.6535573515945375,
+   "unaffected": 0.9119484946032949
+  },
+  "w1_filtered_2": {
+   "affected": 0.6547079667157703,
+   "unaffected": 0.9119800542826485
+  },
+  "w2_frozen": {
+   "affected": 0.5898418640895116,
+   "unaffected": 0.9431153948142085,
+   "n_affected": 236126,
+   "n_unaffected": 173474
+  },
+  "w2_stats_0": {
+   "affected": 0.6631501825296664,
+   "unaffected": 0.8975120190921982
+  },
+  "w2_stats_1": {
+   "affected": 0.6634000491263139,
+   "unaffected": 0.8984746993785813
+  },
+  "w2_stats_2": {
+   "affected": 0.6628452605812151,
+   "unaffected": 0.897898244117274
+  },
+  "w2_filtered_0": {
+   "affected": 0.661892379492305,
+   "unaffected": 0.9152380183773937
+  },
+  "w2_filtered_1": {
+   "affected": 0.6594064186070149,
+   "unaffected": 0.9150016717202578
+  },
+  "w2_filtered_2": {
+   "affected": 0.6580469749201697,
+   "unaffected": 0.9151227273251323
+  }
+ }
+}

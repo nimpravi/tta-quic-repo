@@ -98,6 +98,26 @@ LABEL_FREE_DELAYED = ("src-stats", "src-tent")
 TUNE_EVAL_DAY = "20221116"          # inside W-2022-46; source is delta=1
 
 
+# --- input path resolution -------------------------------------------------
+# Reads search the working directory first, then results/raw and results, so
+# these scripts keep working after the raw artifacts are moved into
+# results/raw/. Writes are unaffected and still land in the working
+# directory, so a rerun never overwrites a committed artifact in place.
+_SEARCH = [".", "results/raw", "results"]
+
+
+def _resolve(name):
+    """Return an existing path for `name`, or `name` itself if not found so
+    that the caller's own missing-file handling still runs."""
+    if os.path.isabs(name) or os.path.isfile(name):
+        return name
+    for d in _SEARCH:
+        p = os.path.join(d, name)
+        if os.path.isfile(p):
+            return p
+    return name
+
+
 def parse_day(s):
     return dt.datetime.strptime(s, "%Y%m%d").date()
 
@@ -269,9 +289,9 @@ def tta_on_window(model, window, device, order):
 
 
 def day_start(day):
-    if not os.path.isfile(AUDIT_JSON):
+    if not os.path.isfile(_resolve(AUDIT_JSON)):
         return None
-    with open(AUDIT_JSON) as f: audit = json.load(f)
+    with open(_resolve(AUDIT_JSON)) as f: audit = json.load(f)
     for per in audit.values():
         if per.get("capped"): continue
         dm = per.get("day_map_from_indices", {})
@@ -358,11 +378,11 @@ def do_tune(args):
 
 
 def do_report(args):
-    if not os.path.isfile(CONFIG_JSON):
+    if not os.path.isfile(_resolve(CONFIG_JSON)):
         sys.exit(f"[STOP] {CONFIG_JSON} not found. Run --tune first; the "
                  f"report week is not touched before the baselines are tuned "
                  f"inside W-2022-46 and recorded.")
-    with open(CONFIG_JSON) as f: cfg = json.load(f)
+    with open(_resolve(CONFIG_JSON)) as f: cfg = json.load(f)
     caps = cfg["per_capacity"]
     print(f"=== EXPERIMENT B REPORT on {TEST_WEEK} ===")
     print(f"    evaluation day {EVAL_DAY}, three report windows "

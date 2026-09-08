@@ -61,6 +61,26 @@ EXPECTED_LAST_BATCH = {"20221121": 603, "20221122": 1233, "20221123": 1856,
 ANCHOR_W47_W1 = 0.72239013671875     # Table I window 1 frozen accuracy
 
 
+# --- input path resolution -------------------------------------------------
+# Reads search the working directory first, then results/raw and results, so
+# these scripts keep working after the raw artifacts are moved into
+# results/raw/. Writes are unaffected and still land in the working
+# directory, so a rerun never overwrites a committed artifact in place.
+_SEARCH = [".", "results/raw", "results"]
+
+
+def _resolve(name):
+    """Return an existing path for `name`, or `name` itself if not found so
+    that the caller's own missing-file handling still runs."""
+    if os.path.isabs(name) or os.path.isfile(name):
+        return name
+    for d in _SEARCH:
+        p = os.path.join(d, name)
+        if os.path.isfile(p):
+            return p
+    return name
+
+
 def build(size, week):
     import torch
     from cesnet_datazoo.datasets import CESNET_QUIC22
@@ -167,11 +187,11 @@ def run_condition(base_model, window, device, cond, order):
 
 
 def load_day_starts():
-    if not os.path.isfile(AUDIT_JSON):
+    if not os.path.isfile(_resolve(AUDIT_JSON)):
         sys.exit(f"[STOP] {AUDIT_JSON} not found. Run "
                  f"scripts/14_stream_order_audit.py first; the day boundaries "
                  f"come from it and are not hardcoded.")
-    with open(AUDIT_JSON) as f:
+    with open(_resolve(AUDIT_JSON)) as f:
         audit = json.load(f)
     if TEST_WEEK not in audit:
         sys.exit(f"[STOP] {AUDIT_JSON} has no {TEST_WEEK} entry.")

@@ -81,6 +81,26 @@ ANCHOR_W47_W1 = 0.72239013671875
 ANCHOR_W45 = [0.955947265625, 0.95069580078125, 0.95899658203125]
 
 
+# --- input path resolution -------------------------------------------------
+# Reads search the working directory first, then results/raw and results, so
+# these scripts keep working after the raw artifacts are moved into
+# results/raw/. Writes are unaffected and still land in the working
+# directory, so a rerun never overwrites a committed artifact in place.
+_SEARCH = [".", "results/raw", "results"]
+
+
+def _resolve(name):
+    """Return an existing path for `name`, or `name` itself if not found so
+    that the caller's own missing-file handling still runs."""
+    if os.path.isabs(name) or os.path.isfile(name):
+        return name
+    for d in _SEARCH:
+        p = os.path.join(d, name)
+        if os.path.isfile(p):
+            return p
+    return name
+
+
 def build(size, week):
     import torch
     from cesnet_datazoo.datasets import CESNET_QUIC22
@@ -297,7 +317,7 @@ def per_class_recall(model, loader, device, n_batches, n_classes, label):
 
 
 def do_partition(args):
-    if os.path.exists(PART_JSON) and not args.force:
+    if os.path.exists(_resolve(PART_JSON)) and not args.force:
         sys.exit(f"[STOP] {PART_JSON} already exists. Rebuilding it after a "
                  f"report-week number exists would defeat its purpose. Use "
                  f"--force only if no --c2 run has ever been performed.")
@@ -361,7 +381,7 @@ def do_partition(args):
         print(f"\n  [note] {len(thin)} affected class(es) rest on fewer than "
               f"100 flows in one of the two periods; their recall estimates "
               f"are noisy and this is visible in {PART_JSON}.")
-    h = sha256_file(PART_JSON)
+    h = sha256_file(_resolve(PART_JSON))
     print(f"\n  {PART_JSON} written.")
     print(f"  SHA-256: {h}")
     print(f"\n  NEXT, before --c2 will run:")
@@ -377,20 +397,20 @@ def t47_support(t, idx):
 
 # --------------------------------------------------------------- C2
 def do_c2(args):
-    if not os.path.exists(PART_JSON):
+    if not os.path.exists(_resolve(PART_JSON)):
         sys.exit(f"[STOP] {PART_JSON} not found. Run --partition first.")
-    if not os.path.exists(PART_SHA):
+    if not os.path.exists(_resolve(PART_SHA)):
         sys.exit(f"[STOP] {PART_SHA} not found. Hash {PART_JSON}, write the "
                  f"digest into {PART_SHA}, and commit both before running "
-                 f"--c2. Current digest: {sha256_file(PART_JSON)}")
-    recorded = open(PART_SHA).read().split()[0].strip().lower()
-    actual = sha256_file(PART_JSON)
+                 f"--c2. Current digest: {sha256_file(_resolve(PART_JSON))}")
+    recorded = open(_resolve(PART_SHA)).read().split()[0].strip().lower()
+    actual = sha256_file(_resolve(PART_JSON))
     if recorded != actual:
         sys.exit(f"[STOP] {PART_JSON} does not match {PART_SHA}.\n"
                  f"  recorded {recorded}\n  actual   {actual}\n"
                  f"  The partition changed after it was committed. Stop and "
                  f"establish why before recording any number.")
-    part = json.load(open(PART_JSON))
+    part = json.load(open(_resolve(PART_JSON)))
     aff = set(part["affected"]); una = set(part["unaffected"])
     print("=== EXPERIMENT C2: per-partition effect on W-2022-47 ===")
     print(f"    partition verified against {PART_SHA} ({actual[:16]}...)")

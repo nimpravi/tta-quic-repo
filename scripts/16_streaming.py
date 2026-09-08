@@ -91,6 +91,26 @@ FULL_WEEK_CONDS = ["frozen", "causal-filtered"]
 WINDOWS_ONLY_CONDS = ["causal-stats", "batchtrans-filtered", "reset-200"]
 
 
+# --- input path resolution -------------------------------------------------
+# Reads search the working directory first, then results/raw and results, so
+# these scripts keep working after the raw artifacts are moved into
+# results/raw/. Writes are unaffected and still land in the working
+# directory, so a rerun never overwrites a committed artifact in place.
+_SEARCH = [".", "results/raw", "results"]
+
+
+def _resolve(name):
+    """Return an existing path for `name`, or `name` itself if not found so
+    that the caller's own missing-file handling still runs."""
+    if os.path.isabs(name) or os.path.isfile(name):
+        return name
+    for d in _SEARCH:
+        p = os.path.join(d, name)
+        if os.path.isfile(p):
+            return p
+    return name
+
+
 def build(size, week):
     import torch
     from cesnet_datazoo.datasets import CESNET_QUIC22
@@ -250,9 +270,9 @@ def acc_range(correct, ntot, a, b):
 
 
 def load_day_map():
-    if not os.path.isfile(AUDIT_JSON):
+    if not os.path.isfile(_resolve(AUDIT_JSON)):
         return None
-    with open(AUDIT_JSON) as f: audit = json.load(f)
+    with open(_resolve(AUDIT_JSON)) as f: audit = json.load(f)
     a = audit.get(TEST_WEEK)
     if not a or a.get("capped"): return None
     return {d: di for d, di in a["day_map_from_indices"].items() if di.get("flows")}
@@ -319,11 +339,11 @@ def do_tune(args):
 
 
 def do_report(args):
-    if not os.path.isfile(CONFIG_JSON):
+    if not os.path.isfile(_resolve(CONFIG_JSON)):
         sys.exit(f"[STOP] {CONFIG_JSON} not found. Run --tune first. The "
                  f"report week is not touched before the configuration is "
                  f"selected on {TUNE_WEEK} and recorded.")
-    with open(CONFIG_JSON) as f: cfg = json.load(f)
+    with open(_resolve(CONFIG_JSON)) as f: cfg = json.load(f)
     lr, quant = cfg["lr"], cfg["quant"]
     print(f"=== EXPERIMENT A REPORT on {TEST_WEEK} ===")
     print(f"    frozen config from {CONFIG_JSON}: lr={lr:.0e}, q={quant} "

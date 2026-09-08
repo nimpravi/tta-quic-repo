@@ -1,0 +1,1046 @@
+{
+ "rule": "affected if recall_W46 < recall_W45 - 0.1",
+ "reference_period": "W-2022-45",
+ "comparison_period": "W-2022-46",
+ "batches_per_period": 600,
+ "min_support_threshold": null,
+ "note": "No minimum support was pre-registered, so none is applied. Classes with zero support in either period have undefined recall and are 'undetermined'. Per-class support is included so thin evidence is visible.",
+ "affected": [
+  1,
+  6,
+  8,
+  9,
+  19,
+  23,
+  39,
+  41,
+  42,
+  43,
+  47,
+  48,
+  49,
+  50,
+  51,
+  52,
+  53,
+  54,
+  55,
+  56,
+  57,
+  58,
+  59,
+  60,
+  61,
+  62,
+  95,
+  96,
+  101
+ ],
+ "unaffected": [
+  0,
+  2,
+  3,
+  4,
+  5,
+  7,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  20,
+  21,
+  22,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30,
+  31,
+  32,
+  33,
+  34,
+  35,
+  36,
+  37,
+  38,
+  40,
+  44,
+  45,
+  46,
+  63,
+  64,
+  65,
+  66,
+  67,
+  68,
+  69,
+  70,
+  71,
+  72,
+  73,
+  74,
+  75,
+  76,
+  77,
+  78,
+  79,
+  80,
+  81,
+  82,
+  83,
+  84,
+  85,
+  86,
+  87,
+  88,
+  89,
+  90,
+  91,
+  92,
+  93,
+  94,
+  97,
+  98,
+  99,
+  100
+ ],
+ "undetermined": [
+  102
+ ],
+ "classes": {
+  "0": {
+   "name": "4chan",
+   "provider": "4chan",
+   "recall_W45": 0.568862,
+   "recall_W46": 0.712042,
+   "support_W45": 167,
+   "support_W46": 191,
+   "bucket": "unaffected"
+  },
+  "1": {
+   "name": "adavoid",
+   "provider": "adavoid",
+   "recall_W45": 0.896373,
+   "recall_W46": 0.245902,
+   "support_W45": 193,
+   "support_W46": 183,
+   "bucket": "affected"
+  },
+  "2": {
+   "name": "alza-identity",
+   "provider": "alza",
+   "recall_W45": 0.41791,
+   "recall_W46": 0.401961,
+   "support_W45": 67,
+   "support_W46": 102,
+   "bucket": "unaffected"
+  },
+  "3": {
+   "name": "alza-webapi",
+   "provider": "alza",
+   "recall_W45": 0.939743,
+   "recall_W46": 0.935674,
+   "support_W45": 2257,
+   "support_W46": 3047,
+   "bucket": "unaffected"
+  },
+  "4": {
+   "name": "alza-www",
+   "provider": "alza",
+   "recall_W45": 0.849182,
+   "recall_W46": 0.856348,
+   "support_W45": 2261,
+   "support_W46": 3954,
+   "bucket": "unaffected"
+  },
+  "5": {
+   "name": "apple-privaterelay",
+   "provider": "apple-privaterelay",
+   "recall_W45": 0.999917,
+   "recall_W46": 1.0,
+   "support_W45": 12069,
+   "support_W46": 11936,
+   "bucket": "unaffected"
+  },
+  "6": {
+   "name": "bitdefender-nimbus",
+   "provider": "bitdefender-nimbus",
+   "recall_W45": 0.864865,
+   "recall_W46": 0.759615,
+   "support_W45": 111,
+   "support_W46": 104,
+   "bucket": "affected"
+  },
+  "7": {
+   "name": "bitly",
+   "provider": "bitly",
+   "recall_W45": 0.933852,
+   "recall_W46": 0.936396,
+   "support_W45": 257,
+   "support_W46": 283,
+   "bucket": "unaffected"
+  },
+  "8": {
+   "name": "blitz-gg",
+   "provider": "blitz-gg",
+   "recall_W45": 0.915641,
+   "recall_W46": 0.797131,
+   "support_W45": 569,
+   "support_W46": 488,
+   "bucket": "affected"
+  },
+  "9": {
+   "name": "blogger",
+   "provider": "google",
+   "recall_W45": 0.815789,
+   "recall_W46": 0.31236,
+   "support_W45": 380,
+   "support_W46": 445,
+   "bucket": "affected"
+  },
+  "10": {
+   "name": "cedexis",
+   "provider": "cedexis",
+   "recall_W45": 0.92,
+   "recall_W46": 0.925424,
+   "support_W45": 900,
+   "support_W46": 885,
+   "bucket": "unaffected"
+  },
+  "11": {
+   "name": "chess-com",
+   "provider": "chess-com",
+   "recall_W45": 0.827419,
+   "recall_W46": 0.819516,
+   "support_W45": 2677,
+   "support_W46": 2726,
+   "bucket": "unaffected"
+  },
+  "12": {
+   "name": "chrome-remotedesktop",
+   "provider": "google",
+   "recall_W45": 0.976101,
+   "recall_W46": 0.969623,
+   "support_W45": 2134,
+   "support_W46": 2041,
+   "bucket": "unaffected"
+  },
+  "13": {
+   "name": "cloudflare-cdnjs",
+   "provider": "cloudflare-cdnjs",
+   "recall_W45": 0.923843,
+   "recall_W46": 0.924932,
+   "support_W45": 8535,
+   "support_W46": 10990,
+   "bucket": "unaffected"
+  },
+  "14": {
+   "name": "connectad",
+   "provider": "connectad",
+   "recall_W45": 0.987979,
+   "recall_W46": 0.987624,
+   "support_W45": 14059,
+   "support_W46": 13817,
+   "bucket": "unaffected"
+  },
+  "15": {
+   "name": "csgo-market",
+   "provider": "csgo-market",
+   "recall_W45": 0.997246,
+   "recall_W46": 0.997635,
+   "support_W45": 2179,
+   "support_W46": 2114,
+   "bucket": "unaffected"
+  },
+  "16": {
+   "name": "dcard",
+   "provider": "dcard",
+   "recall_W45": 0.935484,
+   "recall_W46": 0.933566,
+   "support_W45": 62,
+   "support_W46": 286,
+   "bucket": "unaffected"
+  },
+  "17": {
+   "name": "discord",
+   "provider": "discord",
+   "recall_W45": 0.978356,
+   "recall_W46": 0.978483,
+   "support_W45": 30032,
+   "support_W46": 28814,
+   "bucket": "unaffected"
+  },
+  "18": {
+   "name": "dm-de",
+   "provider": "dm-de",
+   "recall_W45": 0.921687,
+   "recall_W46": 0.923558,
+   "support_W45": 1992,
+   "support_W46": 2237,
+   "bucket": "unaffected"
+  },
+  "19": {
+   "name": "dns-doh",
+   "provider": "dns-doh",
+   "recall_W45": 0.993967,
+   "recall_W46": 0.591838,
+   "support_W45": 37131,
+   "support_W46": 36929,
+   "bucket": "affected"
+  },
+  "20": {
+   "name": "doi-org",
+   "provider": "doi-org",
+   "recall_W45": 0.921547,
+   "recall_W46": 0.939429,
+   "support_W45": 905,
+   "support_W46": 875,
+   "bucket": "unaffected"
+  },
+  "21": {
+   "name": "drmax",
+   "provider": "drmax",
+   "recall_W45": 0.600823,
+   "recall_W46": 0.648907,
+   "support_W45": 729,
+   "support_W46": 732,
+   "bucket": "unaffected"
+  },
+  "22": {
+   "name": "easybrain",
+   "provider": "easybrain",
+   "recall_W45": 0.995,
+   "recall_W46": 0.988033,
+   "support_W45": 1800,
+   "support_W46": 1922,
+   "bucket": "unaffected"
+  },
+  "23": {
+   "name": "ebay-kleinanzeigen",
+   "provider": "ebay-kleinanzeigen",
+   "recall_W45": 0.629921,
+   "recall_W46": 0.425,
+   "support_W45": 127,
+   "support_W46": 80,
+   "bucket": "affected"
+  },
+  "24": {
+   "name": "endnote-click",
+   "provider": "endnote-click",
+   "recall_W45": 0.915068,
+   "recall_W46": 0.882353,
+   "support_W45": 365,
+   "support_W46": 357,
+   "bucket": "unaffected"
+  },
+  "25": {
+   "name": "etoro",
+   "provider": "etoro",
+   "recall_W45": 0.909968,
+   "recall_W46": 0.898622,
+   "support_W45": 622,
+   "support_W46": 1016,
+   "bucket": "unaffected"
+  },
+  "26": {
+   "name": "facebook-connect",
+   "provider": "facebook",
+   "recall_W45": 0.937641,
+   "recall_W46": 0.93328,
+   "support_W45": 14160,
+   "support_W46": 13774,
+   "bucket": "unaffected"
+  },
+  "27": {
+   "name": "facebook-gamesgraph",
+   "provider": "facebook",
+   "recall_W45": 0.998399,
+   "recall_W46": 0.997303,
+   "support_W45": 3123,
+   "support_W46": 5561,
+   "bucket": "unaffected"
+  },
+  "28": {
+   "name": "facebook-graph",
+   "provider": "facebook",
+   "recall_W45": 0.913598,
+   "recall_W46": 0.909665,
+   "support_W45": 38344,
+   "support_W46": 37693,
+   "bucket": "unaffected"
+  },
+  "29": {
+   "name": "facebook-media",
+   "provider": "facebook",
+   "recall_W45": 0.954204,
+   "recall_W46": 0.9519,
+   "support_W45": 41554,
+   "support_W46": 40852,
+   "bucket": "unaffected"
+  },
+  "30": {
+   "name": "facebook-messenger",
+   "provider": "facebook",
+   "recall_W45": 0.892731,
+   "recall_W46": 0.880303,
+   "support_W45": 6535,
+   "support_W46": 6341,
+   "bucket": "unaffected"
+  },
+  "31": {
+   "name": "facebook-rupload",
+   "provider": "facebook",
+   "recall_W45": 0.842335,
+   "recall_W46": 0.823766,
+   "support_W45": 3666,
+   "support_W46": 993,
+   "bucket": "unaffected"
+  },
+  "32": {
+   "name": "facebook-web",
+   "provider": "facebook",
+   "recall_W45": 0.955162,
+   "recall_W46": 0.951377,
+   "support_W45": 36063,
+   "support_W46": 34860,
+   "bucket": "unaffected"
+  },
+  "33": {
+   "name": "firebase-crashlytics",
+   "provider": "google",
+   "recall_W45": 0.943543,
+   "recall_W46": 0.94496,
+   "support_W45": 3206,
+   "support_W46": 2907,
+   "bucket": "unaffected"
+  },
+  "34": {
+   "name": "fitbit",
+   "provider": "fitbit",
+   "recall_W45": 0.590361,
+   "recall_W46": 0.531646,
+   "support_W45": 83,
+   "support_W46": 158,
+   "bucket": "unaffected"
+  },
+  "35": {
+   "name": "flightradar24",
+   "provider": "flightradar24",
+   "recall_W45": 0.78934,
+   "recall_W46": 0.769231,
+   "support_W45": 394,
+   "support_W46": 442,
+   "bucket": "unaffected"
+  },
+  "36": {
+   "name": "fontawesome",
+   "provider": "fontawesome",
+   "recall_W45": 0.971294,
+   "recall_W46": 0.967053,
+   "support_W45": 5295,
+   "support_W46": 4492,
+   "bucket": "unaffected"
+  },
+  "37": {
+   "name": "forum24",
+   "provider": "forum24",
+   "recall_W45": 0.817746,
+   "recall_W46": 0.874667,
+   "support_W45": 1251,
+   "support_W46": 750,
+   "bucket": "unaffected"
+  },
+  "38": {
+   "name": "gamedock",
+   "provider": "gamedock",
+   "recall_W45": 0.897753,
+   "recall_W46": 0.91996,
+   "support_W45": 890,
+   "support_W46": 1012,
+   "bucket": "unaffected"
+  },
+  "39": {
+   "name": "garmin",
+   "provider": "garmin",
+   "recall_W45": 0.9258,
+   "recall_W46": 0.251065,
+   "support_W45": 2938,
+   "support_W46": 2816,
+   "bucket": "affected"
+  },
+  "40": {
+   "name": "gmail",
+   "provider": "google",
+   "recall_W45": 0.991477,
+   "recall_W46": 0.993949,
+   "support_W45": 704,
+   "support_W46": 661,
+   "bucket": "unaffected"
+  },
+  "41": {
+   "name": "google-ads",
+   "provider": "google",
+   "recall_W45": 0.945433,
+   "recall_W46": 0.839802,
+   "support_W45": 91283,
+   "support_W46": 94577,
+   "bucket": "affected"
+  },
+  "42": {
+   "name": "google-authentication",
+   "provider": "google",
+   "recall_W45": 0.929289,
+   "recall_W46": 0.67366,
+   "support_W45": 28963,
+   "support_W46": 28553,
+   "bucket": "affected"
+  },
+  "43": {
+   "name": "google-autofill",
+   "provider": "google",
+   "recall_W45": 0.987061,
+   "recall_W46": 0.852042,
+   "support_W45": 18008,
+   "support_W46": 17532,
+   "bucket": "affected"
+  },
+  "44": {
+   "name": "google-calendar",
+   "provider": "google",
+   "recall_W45": 0.941264,
+   "recall_W46": 0.913345,
+   "support_W45": 12139,
+   "support_W46": 11090,
+   "bucket": "unaffected"
+  },
+  "45": {
+   "name": "google-colab",
+   "provider": "google",
+   "recall_W45": 0.978355,
+   "recall_W46": 0.945909,
+   "support_W45": 1848,
+   "support_W46": 1479,
+   "bucket": "unaffected"
+  },
+  "46": {
+   "name": "google-conncheck",
+   "provider": "google",
+   "recall_W45": 0.983333,
+   "recall_W46": 0.977654,
+   "support_W45": 540,
+   "support_W46": 537,
+   "bucket": "unaffected"
+  },
+  "47": {
+   "name": "google-docs",
+   "provider": "google",
+   "recall_W45": 0.899939,
+   "recall_W46": 0.540156,
+   "support_W45": 8245,
+   "support_W46": 8081,
+   "bucket": "affected"
+  },
+  "48": {
+   "name": "google-drive",
+   "provider": "google",
+   "recall_W45": 0.866825,
+   "recall_W46": 0.603571,
+   "support_W45": 5046,
+   "support_W46": 4760,
+   "bucket": "affected"
+  },
+  "49": {
+   "name": "google-fonts",
+   "provider": "google",
+   "recall_W45": 0.963356,
+   "recall_W46": 0.184208,
+   "support_W45": 57827,
+   "support_W46": 59004,
+   "bucket": "affected"
+  },
+  "50": {
+   "name": "google-gstatic",
+   "provider": "google",
+   "recall_W45": 0.955082,
+   "recall_W46": 0.206149,
+   "support_W45": 64228,
+   "support_W46": 69731,
+   "bucket": "affected"
+  },
+  "51": {
+   "name": "google-hangouts",
+   "provider": "google",
+   "recall_W45": 0.620915,
+   "recall_W46": 0.061024,
+   "support_W45": 612,
+   "support_W46": 508,
+   "bucket": "affected"
+  },
+  "52": {
+   "name": "google-imasdk",
+   "provider": "google",
+   "recall_W45": 0.806472,
+   "recall_W46": 0.194596,
+   "support_W45": 6304,
+   "support_W46": 6588,
+   "bucket": "affected"
+  },
+  "53": {
+   "name": "google-pay",
+   "provider": "google",
+   "recall_W45": 0.956084,
+   "recall_W46": 0.84178,
+   "support_W45": 3575,
+   "support_W46": 4045,
+   "bucket": "affected"
+  },
+  "54": {
+   "name": "google-photos",
+   "provider": "google",
+   "recall_W45": 0.916628,
+   "recall_W46": 0.799082,
+   "support_W45": 4294,
+   "support_W46": 4141,
+   "bucket": "affected"
+  },
+  "55": {
+   "name": "google-play",
+   "provider": "google",
+   "recall_W45": 0.976906,
+   "recall_W46": 0.823814,
+   "support_W45": 73958,
+   "support_W46": 73882,
+   "bucket": "affected"
+  },
+  "56": {
+   "name": "google-recaptcha",
+   "provider": "google",
+   "recall_W45": 0.900549,
+   "recall_W46": 0.705517,
+   "support_W45": 3097,
+   "support_W46": 4187,
+   "bucket": "affected"
+  },
+  "57": {
+   "name": "google-safebrowsing",
+   "provider": "google",
+   "recall_W45": 0.986464,
+   "recall_W46": 0.727543,
+   "support_W45": 41077,
+   "support_W46": 41390,
+   "bucket": "affected"
+  },
+  "58": {
+   "name": "google-scholar",
+   "provider": "google",
+   "recall_W45": 0.816162,
+   "recall_W46": 0.378468,
+   "support_W45": 1485,
+   "support_W46": 1514,
+   "bucket": "affected"
+  },
+  "59": {
+   "name": "google-services",
+   "provider": "google",
+   "recall_W45": 0.98141,
+   "recall_W46": 0.688887,
+   "support_W45": 82787,
+   "support_W46": 81398,
+   "bucket": "affected"
+  },
+  "60": {
+   "name": "google-translate",
+   "provider": "google",
+   "recall_W45": 0.89435,
+   "recall_W46": 0.563624,
+   "support_W45": 11822,
+   "support_W46": 11898,
+   "bucket": "affected"
+  },
+  "61": {
+   "name": "google-usercontent",
+   "provider": "google",
+   "recall_W45": 0.942155,
+   "recall_W46": 0.796496,
+   "support_W45": 37013,
+   "support_W46": 36412,
+   "bucket": "affected"
+  },
+  "62": {
+   "name": "google-www",
+   "provider": "google",
+   "recall_W45": 0.968318,
+   "recall_W46": 0.384572,
+   "support_W45": 95953,
+   "support_W46": 95605,
+   "bucket": "affected"
+  },
+  "63": {
+   "name": "goout",
+   "provider": "goout",
+   "recall_W45": 0.905077,
+   "recall_W46": 0.922141,
+   "support_W45": 453,
+   "support_W46": 411,
+   "bucket": "unaffected"
+  },
+  "64": {
+   "name": "hcaptcha",
+   "provider": "hcaptcha",
+   "recall_W45": 0.856061,
+   "recall_W46": 0.887663,
+   "support_W45": 924,
+   "support_W46": 997,
+   "bucket": "unaffected"
+  },
+  "65": {
+   "name": "hubspot",
+   "provider": "hubspot",
+   "recall_W45": 0.941152,
+   "recall_W46": 0.931998,
+   "support_W45": 2379,
+   "support_W46": 2147,
+   "bucket": "unaffected"
+  },
+  "66": {
+   "name": "instagram",
+   "provider": "facebook",
+   "recall_W45": 0.9775,
+   "recall_W46": 0.975441,
+   "support_W45": 56090,
+   "support_W46": 54644,
+   "bucket": "unaffected"
+  },
+  "67": {
+   "name": "joinhoney",
+   "provider": "joinhoney",
+   "recall_W45": 0.94586,
+   "recall_W46": 0.948831,
+   "support_W45": 4082,
+   "support_W46": 4065,
+   "bucket": "unaffected"
+  },
+  "68": {
+   "name": "jsdelivr",
+   "provider": "jsdelivr",
+   "recall_W45": 0.71976,
+   "recall_W46": 0.724007,
+   "support_W45": 9995,
+   "support_W46": 9464,
+   "bucket": "unaffected"
+  },
+  "69": {
+   "name": "kaggle",
+   "provider": "kaggle",
+   "recall_W45": 0.909091,
+   "recall_W46": 0.872483,
+   "support_W45": 154,
+   "support_W46": 149,
+   "bucket": "unaffected"
+  },
+  "70": {
+   "name": "kiwi-com",
+   "provider": "kiwi-com",
+   "recall_W45": 0.858188,
+   "recall_W46": 0.822596,
+   "support_W45": 1093,
+   "support_W46": 1071,
+   "bucket": "unaffected"
+  },
+  "71": {
+   "name": "livescore",
+   "provider": "livescore",
+   "recall_W45": 0.470588,
+   "recall_W46": 0.375,
+   "support_W45": 34,
+   "support_W46": 24,
+   "bucket": "unaffected"
+  },
+  "72": {
+   "name": "mdpi",
+   "provider": "mdpi",
+   "recall_W45": 0.901384,
+   "recall_W46": 0.840909,
+   "support_W45": 1156,
+   "support_W46": 1100,
+   "bucket": "unaffected"
+  },
+  "73": {
+   "name": "medium",
+   "provider": "medium",
+   "recall_W45": 0.860685,
+   "recall_W46": 0.890503,
+   "support_W45": 847,
+   "support_W46": 895,
+   "bucket": "unaffected"
+  },
+  "74": {
+   "name": "mentimeter",
+   "provider": "mentimeter",
+   "recall_W45": 0.685811,
+   "recall_W46": 0.6,
+   "support_W45": 296,
+   "support_W46": 630,
+   "bucket": "unaffected"
+  },
+  "75": {
+   "name": "microsoft-outlook",
+   "provider": "microsoft",
+   "recall_W45": 0.975516,
+   "recall_W46": 0.978083,
+   "support_W45": 14540,
+   "support_W46": 14509,
+   "bucket": "unaffected"
+  },
+  "76": {
+   "name": "microsoft-substrate",
+   "provider": "microsoft",
+   "recall_W45": 0.887892,
+   "recall_W46": 0.897199,
+   "support_W45": 4014,
+   "support_W46": 4105,
+   "bucket": "unaffected"
+  },
+  "77": {
+   "name": "ncbi-gov",
+   "provider": "ncbi-gov",
+   "recall_W45": 0.713342,
+   "recall_W46": 0.725444,
+   "support_W45": 757,
+   "support_W46": 845,
+   "bucket": "unaffected"
+  },
+  "78": {
+   "name": "onesignal",
+   "provider": "onesignal",
+   "recall_W45": 0.85724,
+   "recall_W46": 0.852912,
+   "support_W45": 2956,
+   "support_W46": 3005,
+   "bucket": "unaffected"
+  },
+  "79": {
+   "name": "openx",
+   "provider": "openx",
+   "recall_W45": 0.943703,
+   "recall_W46": 0.949535,
+   "support_W45": 14228,
+   "support_W46": 11176,
+   "bucket": "unaffected"
+  },
+  "80": {
+   "name": "overleaf-cdn",
+   "provider": "overleaf",
+   "recall_W45": 0.45641,
+   "recall_W46": 0.478673,
+   "support_W45": 195,
+   "support_W46": 211,
+   "bucket": "unaffected"
+  },
+  "81": {
+   "name": "overleaf-compile",
+   "provider": "overleaf",
+   "recall_W45": 0.939227,
+   "recall_W46": 0.944812,
+   "support_W45": 362,
+   "support_W46": 453,
+   "bucket": "unaffected"
+  },
+  "82": {
+   "name": "playradio",
+   "provider": "playradio",
+   "recall_W45": 0.935712,
+   "recall_W46": 0.910721,
+   "support_W45": 2971,
+   "support_W46": 2733,
+   "bucket": "unaffected"
+  },
+  "83": {
+   "name": "pocasidata-cz",
+   "provider": "pocasidata-cz",
+   "recall_W45": 0.882353,
+   "recall_W46": 0.877193,
+   "support_W45": 119,
+   "support_W46": 114,
+   "bucket": "unaffected"
+  },
+  "84": {
+   "name": "revolut",
+   "provider": "revolut",
+   "recall_W45": 0.90942,
+   "recall_W46": 0.883838,
+   "support_W45": 276,
+   "support_W46": 198,
+   "bucket": "unaffected"
+  },
+  "85": {
+   "name": "rohlik",
+   "provider": "rohlik",
+   "recall_W45": 0.488327,
+   "recall_W46": 0.557692,
+   "support_W45": 514,
+   "support_W46": 728,
+   "bucket": "unaffected"
+  },
+  "86": {
+   "name": "shazam",
+   "provider": "shazam",
+   "recall_W45": 0.965278,
+   "recall_W46": 0.954839,
+   "support_W45": 288,
+   "support_W46": 310,
+   "bucket": "unaffected"
+  },
+  "87": {
+   "name": "signal-cdn",
+   "provider": "signal-cdn",
+   "recall_W45": 0.977444,
+   "recall_W46": 0.986979,
+   "support_W45": 399,
+   "support_W46": 384,
+   "bucket": "unaffected"
+  },
+  "88": {
+   "name": "sme-sk",
+   "provider": "sme-sk",
+   "recall_W45": 0.862212,
+   "recall_W46": 0.891321,
+   "support_W45": 3607,
+   "support_W46": 3837,
+   "bucket": "unaffected"
+  },
+  "89": {
+   "name": "snapchat",
+   "provider": "snapchat",
+   "recall_W45": 0.995069,
+   "recall_W46": 0.960136,
+   "support_W45": 47662,
+   "support_W46": 46634,
+   "bucket": "unaffected"
+  },
+  "90": {
+   "name": "spanbang",
+   "provider": "spanbang",
+   "recall_W45": 0.754783,
+   "recall_W46": 0.692708,
+   "support_W45": 575,
+   "support_W46": 768,
+   "bucket": "unaffected"
+  },
+  "91": {
+   "name": "spotify",
+   "provider": "spotify",
+   "recall_W45": 0.988851,
+   "recall_W46": 0.988775,
+   "support_W45": 51035,
+   "support_W46": 49976,
+   "bucket": "unaffected"
+  },
+  "92": {
+   "name": "tawkto",
+   "provider": "tawkto",
+   "recall_W45": 0.888412,
+   "recall_W46": 0.898603,
+   "support_W45": 1864,
+   "support_W46": 1933,
+   "bucket": "unaffected"
+  },
+  "93": {
+   "name": "tiktok",
+   "provider": "tiktok",
+   "recall_W45": 0.99506,
+   "recall_W46": 0.9972,
+   "support_W45": 3239,
+   "support_W46": 3214,
+   "bucket": "unaffected"
+  },
+  "94": {
+   "name": "tinypass",
+   "provider": "tinypass",
+   "recall_W45": 0.714286,
+   "recall_W46": 0.670611,
+   "support_W45": 385,
+   "support_W46": 507,
+   "bucket": "unaffected"
+  },
+  "95": {
+   "name": "toggl",
+   "provider": "toggl",
+   "recall_W45": 0.729927,
+   "recall_W46": 0.561224,
+   "support_W45": 137,
+   "support_W46": 98,
+   "bucket": "affected"
+  },
+  "96": {
+   "name": "uber",
+   "provider": "uber",
+   "recall_W45": 0.918367,
+   "recall_W46": 0.785714,
+   "support_W45": 49,
+   "support_W46": 56,
+   "bucket": "affected"
+  },
+  "97": {
+   "name": "unitygames",
+   "provider": "unitygames",
+   "recall_W45": 0.907235,
+   "recall_W46": 0.919389,
+   "support_W45": 2253,
+   "support_W46": 2357,
+   "bucket": "unaffected"
+  },
+  "98": {
+   "name": "usercentrics",
+   "provider": "usercentrics",
+   "recall_W45": 0.898677,
+   "recall_W46": 0.908755,
+   "support_W45": 2872,
+   "support_W46": 2707,
+   "bucket": "unaffected"
+  },
+  "99": {
+   "name": "whatsapp",
+   "provider": "facebook",
+   "recall_W45": 0.85136,
+   "recall_W46": 0.876712,
+   "support_W45": 3014,
+   "support_W46": 2993,
+   "bucket": "unaffected"
+  },
+  "100": {
+   "name": "xhamster",
+   "provider": "xhamster",
+   "recall_W45": 0.931629,
+   "recall_W46": 0.937162,
+   "support_W45": 1682,
+   "support_W46": 2037,
+   "bucket": "unaffected"
+  },
+  "101": {
+   "name": "youtube",
+   "provider": "google",
+   "recall_W45": 0.947876,
+   "recall_W46": 0.685812,
+   "support_W45": 60414,
+   "support_W46": 60537,
+   "bucket": "affected"
+  },
+  "102": {
+   "name": "_unknown",
+   "provider": "_unknown",
+   "recall_W45": null,
+   "recall_W46": null,
+   "support_W45": 0,
+   "support_W46": 0,
+   "bucket": "undetermined"
+  }
+ }
+}

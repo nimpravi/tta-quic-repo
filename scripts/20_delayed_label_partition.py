@@ -79,6 +79,26 @@ RECORDED_B = {
  (7,"full"):[14.27,13.39,12.88],   (7,"matched+tta"):[11.07,11.09,10.15]}
 
 
+# --- input path resolution -------------------------------------------------
+# Reads search the working directory first, then results/raw and results, so
+# these scripts keep working after the raw artifacts are moved into
+# results/raw/. Writes are unaffected and still land in the working
+# directory, so a rerun never overwrites a committed artifact in place.
+_SEARCH = [".", "results/raw", "results"]
+
+
+def _resolve(name):
+    """Return an existing path for `name`, or `name` itself if not found so
+    that the caller's own missing-file handling still runs."""
+    if os.path.isabs(name) or os.path.isfile(name):
+        return name
+    for d in _SEARCH:
+        p = os.path.join(d, name)
+        if os.path.isfile(p):
+            return p
+    return name
+
+
 def sha256_file(p):
     h = hashlib.sha256()
     with open(p,"rb") as f:
@@ -257,14 +277,14 @@ def main():
 
     for f in (PART_JSON, PART_SHA, CONFIG_JSON):
         if not os.path.exists(f): sys.exit(f"[STOP] {f} not found.")
-    rec=open(PART_SHA).read().split()[0].strip().lower()
-    act=sha256_file(PART_JSON)
+    rec=open(_resolve(PART_SHA)).read().split()[0].strip().lower()
+    act=sha256_file(_resolve(PART_JSON))
     if rec!=act:
         sys.exit(f"[STOP] {PART_JSON} does not match {PART_SHA}.\n"
                  f"  recorded {rec}\n  actual   {act}")
-    part=json.load(open(PART_JSON))
+    part=json.load(open(_resolve(PART_JSON)))
     aff=np.array(part["affected"]); una=np.array(part["unaffected"])
-    caps=json.load(open(CONFIG_JSON))["per_capacity"]
+    caps=json.load(open(_resolve(CONFIG_JSON)))["per_capacity"]
     print(f"partition verified ({act[:16]}...): {len(aff)} affected, "
           f"{len(una)} unaffected classes")
     for c, b in caps.items():
@@ -292,8 +312,8 @@ def main():
                           name="W-47 window 1 frozen (Table I anchor)")
             print(f"  [ANCHOR OK] window 1 frozen = {rec_i['overall']!r}")
         fro.append(rec_i)
-    if os.path.exists(C2_CKPT):
-        c2=json.load(open(C2_CKPT))["done"]
+    if os.path.exists(_resolve(C2_CKPT)):
+        c2=json.load(open(_resolve(C2_CKPT)))["done"]
         ok=True
         for i in range(3):
             b=c2.get(f"w{i}_frozen")
@@ -354,8 +374,8 @@ def main():
         print()
 
     bprog = None
-    if os.path.exists(B_CKPT):
-        bprog = json.load(open(B_CKPT)).get("done", {})
+    if os.path.exists(_resolve(B_CKPT)):
+        bprog = json.load(open(_resolve(B_CKPT))).get("done", {})
         print(f"  comparison values taken from {B_CKPT}, matched unit for unit")
     else:
         print(f"  [note] {B_CKPT} not found; comparing against the recorded "
