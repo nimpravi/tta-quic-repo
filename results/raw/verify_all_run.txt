@@ -1,0 +1,206 @@
+========================================================================
+1. DRIFT MAGNITUDE AND THE GAP DENOMINATOR
+========================================================================
+  PASS  W-45 window 1 frozen: 0.955947265625 vs 0.955947265625
+  PASS  W-45 window 2 frozen: 0.95069580078125 vs 0.95069580078125
+  PASS  W-45 window 3 frozen: 0.95899658203125 vs 0.95899658203125
+  PASS  W-45 mean (pre-shift reference): 0.9552 vs 0.9552
+  PASS  W-46 window 1 frozen: 0.7233 vs 0.7233
+  PASS  W-46 window 2 frozen: 0.7253 vs 0.7253
+  PASS  W-46 window 3 frozen: 0.7451 vs 0.7451
+  PASS  W-47 window 1 frozen: 0.72239013671875 vs 0.72239013671875
+  PASS  W-47 window 2 frozen: 0.72425537109375 vs 0.72425537109375
+  PASS  W-47 window 3 frozen: 0.73946044921875 vs 0.73946044921875
+  PASS  gap (points): 22.6511 vs 22.6500
+
+========================================================================
+2. EPISODIC DECOMPOSITION (Table I) AND STEP COUNT (Table II)
+========================================================================
+  PASS  stats-only, 50 steps pooled mean: 2.4344 vs 2.4300
+  PASS  stats-only, 50 steps pooled std: 0.1528 vs 0.1500
+  PASS  stats-only, 50 steps window 1: 2.6428 vs 2.6400
+  PASS  stats-only, 50 steps window 2: 2.3477 vs 2.3500
+  PASS  stats-only, 50 steps window 3: 2.3127 vs 2.3100
+  PASS  filtered, 50 steps pooled mean: 3.0591 vs 3.0600
+  PASS  filtered, 50 steps pooled std: 0.2664 vs 0.2700
+  PASS  filtered, 50 steps window 1: 3.4160 vs 3.4200
+  PASS  filtered, 50 steps window 2: 2.9514 vs 2.9500
+  PASS  filtered, 50 steps window 3: 2.8100 vs 2.8100
+  PASS  unfiltered, 50 steps pooled mean: 1.3159 vs 1.3200
+  PASS  unfiltered, 50 steps pooled std: 0.5254 vs 0.5300
+  PASS  unfiltered, 50 steps window 1: 1.9869 vs 1.9900
+  PASS  unfiltered, 50 steps window 2: 1.1767 vs 1.1800
+  PASS  unfiltered, 50 steps window 3: 0.7842 vs 0.7800
+  PASS  filtered, 100 steps pooled mean: 2.9610 vs 2.9600
+  PASS  filtered, 100 steps pooled std: 0.2725 vs 0.2700
+  PASS  filtered, 100 steps window 1: 3.3388 vs 3.3400
+  PASS  filtered, 100 steps window 2: 2.8191 vs 2.8200
+  PASS  filtered, 100 steps window 3: 2.7253 vs 2.7300
+  PASS  labeled oracle, 50 steps pooled mean: 11.5461 vs 11.5500
+  PASS  labeled oracle, 50 steps pooled std: 0.3838 vs 0.3800
+  PASS  labeled oracle, 50 steps window 1: 12.0250 vs 12.0200
+  PASS  labeled oracle, 50 steps window 2: 11.5151 vs 11.5200
+  PASS  labeled oracle, 50 steps window 3: 11.0983 vs 11.1000
+  PASS  two-phase (rejected) pooled mean: 4.3056 vs 4.3100
+  PASS  two-phase (rejected) window 1: 4.8987 vs 4.9000
+  PASS  two-phase (rejected) window 2: 4.0008 vs 4.0000
+  PASS  two-phase (rejected) window 3: 4.0173 vs 4.0200
+  PASS  frozen W-47 accuracies bit-identical across 6 artifacts
+  NOTE  two-phase std is 0.46p at ddof=0 and 0.49p at ddof=1. RESULTS.md section 6 records 0.49, which is the ddof=1 value; every other std in the record is ddof=0. Make them consistent.
+
+========================================================================
+3. PRE-REGISTERED SWITCH-POINT SELECTION (Table IV)
+========================================================================
+  PASS  switch 25 mean: 5.1134 vs 5.1100
+  PASS  switch 25 order-std: 0.2745 vs 0.2700
+  PASS  switch 37 mean: 3.9756 vs 3.9800
+  PASS  switch 37 order-std: 0.3039 vs 0.3000
+  PASS  switch 50 mean: 3.4554 vs 3.4600
+  PASS  switch 50 order-std: 0.1807 vs 0.1800
+  PASS  switch 62 mean: 2.4510 vs 2.4500
+  PASS  switch 62 order-std: 1.8763 vs 1.8800
+  PASS  switch 75 mean: 2.2282 vs 2.2300
+  PASS  switch 75 order-std: 1.7161 vs 1.7200
+  PASS  switch 62 worst ordering: -1.2777 vs -1.2800
+  PASS  switch 75 worst ordering: -1.1296 vs -1.1300
+  PASS  W-46 frozen identical across all 25 selection units: True vs True
+
+========================================================================
+4. EXPERIMENT D: matched stability reference
+========================================================================
+  PASS  D mean: 2.4219 vs 2.4200
+  PASS  D order-std: 0.0907 vs 0.0900
+  PASS  D frozen matches the switch-point anchor: 0.7534749348958333 vs 0.7534749348958333
+  NOTE  the matched order-std is 0.09p against the 0.06p the 0.12p ceiling was built from. A matched ceiling would have been 0.18p; the selected switch point's 0.27p still exceeds it, so the rejection survives.
+
+========================================================================
+5. EXPERIMENT E: across-day replication
+========================================================================
+  PASS  E filtered across-day mean: 3.0386 vs 3.0400
+  PASS  E filtered across-day std: 0.2376 vs 0.2400
+  PASS  E stats across-day mean: 2.2187 vs 2.2200
+  PASS  E no day below the frozen baseline: 1.0000 vs 1.0000
+  PASS  E 20221121 frozen reproduces Table I window 1: 0.72239013671875 vs 0.72239013671875
+  PASS  E 20221121 filtered units reproduce Table I window 1 exactly: [3.405, 3.4604, 3.332] vs [3.405, 3.4604, 3.332]
+
+========================================================================
+6. EXPERIMENT A: streaming
+========================================================================
+  PASS  A selected lr: 0.0001 vs 0.0001
+  PASS  A selected quantile: 0.5000 vs 0.5000
+  PASS  A frozen window 1: 0.72239013671875 vs 0.72239013671875
+  PASS  A frozen window 2: 0.72425537109375 vs 0.72425537109375
+  PASS  A frozen window 3: 0.73946044921875 vs 0.73946044921875
+  PASS  A causal-filtered 3-window mean recovery: 2.8840 vs 2.8800
+  PASS  A causal-filtered full-week recovery: 2.6266 vs 2.6300
+  PASS  A batch-transductive buffer value (vs causal): -0.1988 vs -0.2000
+  PASS  A full-week batch count: 3227.0000 vs 3227.0000
+
+========================================================================
+7. A0: STREAM ORDER AUDIT
+========================================================================
+  PASS  W-2022-46 uncapped: False vs False
+  PASS  W-2022-46 batches: 2464.0000 vs 2464.0000
+  PASS  W-2022-46 flows: 5044543.0000 vs 5044543.0000
+  PASS  W-2022-46 batch-order criterion: 1.0000 vs 1.0000
+  PASS  W-2022-46 displacement p99.9 below one batch: 1.0000 vs 1.0000
+  PASS  W-2022-47 uncapped: False vs False
+  PASS  W-2022-47 batches: 3227.0000 vs 3227.0000
+  PASS  W-2022-47 flows: 6607244.0000 vs 6607244.0000
+  PASS  W-2022-47 batch-order criterion: 1.0000 vs 1.0000
+  PASS  W-2022-47 displacement p99.9 below one batch: 1.0000 vs 1.0000
+  PASS  W-47 report window 1 span (hours): 11.1900 vs 11.1900
+  PASS  W-47 report window 2 span (hours): 4.4600 vs 4.4600
+  PASS  W-47 report window 3 span (hours): 8.1200 vs 8.1200
+  PASS  all three W-47 report windows fall inside 20221121: True vs True
+
+========================================================================
+8. EXPERIMENT B: delayed-label baselines
+========================================================================
+  PASS  B matched selected steps: 100.0000 vs 100.0000
+  PASS  B matched selected lr: 0.0010 vs 0.0010
+  PASS  B head selected steps: 100.0000 vs 100.0000
+  PASS  B head selected lr: 0.0010 vs 0.0010
+  PASS  B full selected steps: 100.0000 vs 100.0000
+  PASS  B full selected lr: 0.0001 vs 0.0001
+  PASS  B src-tent selected steps: 50.0000 vs 50.0000
+  PASS  B src-tent selected lr: 0.0010 vs 0.0010
+  PASS  B src-stats has no learning rate: None vs None
+  PASS  B matched delta=1d: 13.5510 vs 13.5500
+  PASS  B matched delta=3d: 13.4259 vs 13.4300
+  PASS  B matched delta=7d: 12.0365 vs 12.0400
+  PASS  B head delta=1d: 11.0703 vs 11.0700
+  PASS  B head delta=3d: 11.2806 vs 11.2800
+  PASS  B head delta=7d: 11.2118 vs 11.2100
+  PASS  B full delta=1d: 14.2025 vs 14.2000
+  PASS  B full delta=3d: 14.7178 vs 14.7200
+  PASS  B full delta=7d: 13.5116 vs 13.5100
+  PASS  B src-stats delta=1d: 2.2059 vs 2.2100
+  PASS  B src-stats delta=3d: 2.7429 vs 2.7400
+  PASS  B src-stats delta=7d: 2.1586 vs 2.1600
+  PASS  B src-tent delta=1d: 2.8362 vs 2.8400
+  PASS  B src-tent delta=3d: 2.9174 vs 2.9200
+  PASS  B src-tent delta=7d: 2.6590 vs 2.6600
+  PASS  B-K1 margin over the label-free comparator: 11.6578 vs 11.6600
+  NOTE  B-K1 fired at every delta. The worst supervised baseline at any delay still exceeds the best label-free result anywhere in the study.
+
+========================================================================
+9. EXPERIMENT C: cost on non-drifted traffic
+========================================================================
+  PASS  C1 W-45 window 1 stats: -0.0891 vs -0.0900
+  PASS  C1 W-45 window 2 stats: -0.0710 vs -0.0700
+  PASS  C1 W-45 window 3 stats: -0.0411 vs -0.0400
+  PASS  C1 W-45 window 1 filtered: -0.3155 vs -0.3200
+  PASS  C1 W-45 window 2 filtered: -0.2877 vs -0.2900
+  PASS  C1 W-45 window 3 filtered: -0.3044 vs -0.3000
+  PASS  partition affected classes: 29.0000 vs 29.0000
+  PASS  partition unaffected classes: 73.0000 vs 73.0000
+  PASS  google classes in the affected set: 21.0000 vs 21.0000
+  reconstruction of Table I from the class partition:
+  PASS  C2 window 1 stats net reconstructs Table I: 2.6428 vs 2.6400
+  PASS  C2 window 1 filtered net reconstructs Table I: 3.3992 vs 3.4200
+  PASS  C2 window 2 stats net reconstructs Table I: 2.3477 vs 2.3500
+  PASS  C2 window 2 filtered net reconstructs Table I: 2.9548 vs 2.9500
+  PASS  C2 window 3 stats net reconstructs Table I: 2.3127 vs 2.3100
+  PASS  C2 window 3 filtered net reconstructs Table I: 2.8463 vs 2.8100
+  PASS  C2 filtered gain on affected: 6.8694 vs 6.8700
+  PASS  C2 filtered loss on unaffected: -2.7892 vs -2.7900
+  PASS  C2 stats gain on affected: 7.1800 vs 7.1800
+  PASS  C2 stats loss on unaffected: -4.8870 vs -4.8900
+  PASS  break-even drifted fraction, filtered: 0.2884 vs 0.2880
+  PASS  break-even drifted fraction, stats-only: 0.4044 vs 0.4040
+
+========================================================================
+10. POST-HOC PARTITION OF THE SUPERVISED CONDITIONS (not pre-registered)
+========================================================================
+  PASS  post-hoc head on affected: 18.3039 vs 18.3000
+  PASS  post-hoc head on unaffected: 0.1129 vs 0.1100
+  PASS  post-hoc matched on affected: 22.1315 vs 22.1300
+  PASS  post-hoc matched on unaffected: -0.9066 vs -0.9100
+  PASS  post-hoc full on affected: 23.6077 vs 23.6100
+  PASS  post-hoc full on unaffected: -0.4039 vs -0.4000
+  PASS  post-hoc matched+tta on affected: 20.2534 vs 20.2500
+  PASS  post-hoc matched+tta on unaffected: -1.6907 vs -1.6900
+  PASS  post-hoc src-stats on affected: 7.1072 vs 7.1100
+  PASS  post-hoc src-stats on unaffected: -5.2549 vs -5.2500
+  PASS  post-hoc src-tent on affected: 6.7923 vs 6.7900
+  PASS  post-hoc src-tent on unaffected: -3.4996 vs -3.5000
+  PASS  post-hoc k=0 units reproduce Experiment B bit-for-bit except: ['full d=1', 'full d=3', 'full d=7']
+  NOTE  'full' is the only condition that puts the whole model in training mode. If the architecture contains dropout, that condition is stochastic and unseeded, and the repository's determinism claim needs an explicit exception for it. Verify by listing the model's Dropout modules; do not assert it without checking.
+
+========================================================================
+11. COVERAGE
+========================================================================
+  Artifacts this script does NOT parse, and which therefore remain
+  unverified by it. Check these by hand before submission:
+    - collapse_check_q0.5_steps50.json (Table III class-level behaviour)
+    - leakage_demo.json (section III-E audit)
+    - w45_depth_probe.json (Figure 2)
+    - switchpoint_probe.json (superseded coarse probe)
+
+========================================================================
+SUMMARY
+========================================================================
+  145 passed, 0 failed, 0 artifacts missing
+
+  Every number checked reproduces from the released artifacts.

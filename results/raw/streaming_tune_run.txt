@@ -1,0 +1,36 @@
+=== EXPERIMENT A TUNING on W-2022-46 (first 600 batches) ===
+    grid lr x quantile = [0.0001, 0.001] x [0.5, 1.0], condition causal-filtered
+    W-2022-47 IS NOT TOUCHED BY THIS MODE
+
+device=cpu
+
+    causal-filtered: 200/600 batches, running acc 0.7547 (11.4m)
+    causal-filtered: 400/600 batches, running acc 0.7543 (23.1m)
+    causal-filtered: 600/600 batches, running acc 0.7595 (34.4m)
+  lr=1e-04 q=0.5: streaming accuracy 0.7595
+
+    causal-filtered: 200/600 batches, running acc 0.7489 (11.4m)
+    causal-filtered: 400/600 batches, running acc 0.7458 (22.9m)
+    causal-filtered: 600/600 batches, running acc 0.7498 (34.4m)
+  lr=1e-04 q=1.0: streaming accuracy 0.7498
+
+    causal-filtered: 200/600 batches, running acc 0.7561 (11.6m)
+    causal-filtered: 400/600 batches, running acc 0.7550 (23.1m)
+    causal-filtered: 600/600 batches, running acc 0.7589 (34.7m)
+  lr=1e-03 q=0.5: streaming accuracy 0.7589
+
+    causal-filtered: 200/600 batches, running acc 0.7387 (11.7m)
+    causal-filtered: 400/600 batches, running acc 0.7323 (23.6m)
+    causal-filtered: 600/600 batches, running acc 0.7348 (35.5m)
+  lr=1e-03 q=1.0: streaming accuracy 0.7348
+
+    frozen: 200/600 batches, running acc 0.7233 (3.3m)
+    frozen: 400/600 batches, running acc 0.7243 (6.5m)
+    frozen: 600/600 batches, running acc 0.7312 (9.8m)
+  frozen reference on the same batches: 0.7312
+
+==== SELECTED (frozen from here on) ====
+  lr = 1e-04, quantile = 0.5  (W-46 streaming accuracy 0.7595 vs frozen 0.7312, +2.83p)
+  written to streaming_config.json
+
+  Record this configuration in RESULTS.md, then run --report.

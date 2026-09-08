@@ -1,0 +1,102 @@
+=== AUDITING W-2022-46 ===
+  day map: 7 dates, 5,044,543 flows, 2,464 batches expected
+  200 batches, 409,600 flows (0.1m)
+  400 batches, 819,200 flows (0.2m)
+  600 batches, 1,228,800 flows (0.2m)
+  800 batches, 1,638,400 flows (0.3m)
+  1000 batches, 2,048,000 flows (0.4m)
+  1200 batches, 2,457,600 flows (0.4m)
+  1400 batches, 2,867,200 flows (0.5m)
+  1600 batches, 3,276,800 flows (0.6m)
+  1800 batches, 3,686,400 flows (0.6m)
+  2000 batches, 4,096,000 flows (0.7m)
+  2200 batches, 4,505,600 flows (0.8m)
+  2400 batches, 4,915,200 flows (0.9m)
+  dtype datetime64[us]   5,044,526 of 5,044,543 flows carry a sub-second component
+  batches / flows    : 2,464 / 5,044,543
+  span (local)       : 2022-11-13T17:58:46.714082 to 2022-11-20T17:58:49.543768  (168.0 h)
+  one batch spans    : p50 394.0 s (min 263.2, max 1656.0) of wall clock
+  day boundaries (dataset's own per-date tables):
+    20221114: batches     0 to   588,  1,204,583 flows
+    20221115: batches   588 to  1174,  1,201,414 flows
+    20221116: batches  1174 to  1656,    985,894 flows
+    20221117: batches  1656 to  1852,    402,607 flows
+    20221118: batches  1852 to  2116,    540,187 flows
+    20221119: batches  2116 to  2265,    304,819 flows
+    20221120: batches  2265 to  2463,    405,039 flows
+  report windows fall in: window_1 -> 20221114; window_2 -> 20221114; window_3 -> 20221114, 20221115
+  TIME_FIRST
+    non-decreasing   : 0.504683   [pre-registered gate 0.99] -> FAIL
+    backward steps s : p50 7.711, p90 43.86, p99 210.429, p99.9 256.974, max 368.942
+    displacement pos : p50 124, p90 316, p99 1658, p99.9 5571, max 8497   (batch = 2048)
+    beyond one batch : 7.11e-03 of flows
+  TIME_LAST
+    non-decreasing   : 0.507526
+    backward steps s : p50 3.975, p90 16.826, p99 57.259, p99.9 82.156, max 141.126
+    displacement pos : p50 38, p90 101, p99 445, p99.9 1574, max 2428   (batch = 2048)
+    beyond one batch : 5.15e-06 of flows
+  flow duration s    : p50 0.207, p90 25.414, p99 120.048, max 360.475
+  BATCH ORDER        : per-batch median in order for 1.000000 of pairs -> PASS [0.999]
+  DISPLACEMENT       : p99.9 on time_last = 1574 positions (0.7686 batches) -> PASS [< 2048]
+  window_1: batches 0-199, 11.15 h, 2022-11-13T17:58:46.714082 to 2022-11-14T05:07:29.216654
+  window_2: batches 200-399, 4.72 h, 2022-11-14T05:06:32.841237 to 2022-11-14T09:49:32.883966
+  window_3: batches 400-599, 9.2 h, 2022-11-14T09:49:33.832757 to 2022-11-14T19:01:30.070940
+
+=== AUDITING W-2022-47 ===
+  day map: 7 dates, 6,607,244 flows, 3,227 batches expected
+  200 batches, 409,600 flows (0.1m)
+  400 batches, 819,200 flows (0.1m)
+  600 batches, 1,228,800 flows (0.2m)
+  800 batches, 1,638,400 flows (0.3m)
+  1000 batches, 2,048,000 flows (0.4m)
+  1200 batches, 2,457,600 flows (0.4m)
+  1400 batches, 2,867,200 flows (0.5m)
+  1600 batches, 3,276,800 flows (0.6m)
+  1800 batches, 3,686,400 flows (0.6m)
+  2000 batches, 4,096,000 flows (0.7m)
+  2200 batches, 4,505,600 flows (0.8m)
+  2400 batches, 4,915,200 flows (0.8m)
+  2600 batches, 5,324,800 flows (0.9m)
+  2800 batches, 5,734,400 flows (1.0m)
+  3000 batches, 6,144,000 flows (1.1m)
+  3200 batches, 6,553,600 flows (1.1m)
+  dtype datetime64[us]   6,607,221 of 6,607,244 flows carry a sub-second component
+  batches / flows    : 3,227 / 6,607,244
+  span (local)       : 2022-11-20T17:58:53.383786 to 2022-11-27T17:58:43.183228  (168.0 h)
+  one batch spans    : p50 364.2 s (min 238.5, max 1518.5) of wall clock
+  day boundaries (dataset's own per-date tables):
+    20221121: batches     0 to   603,  1,236,267 flows
+    20221122: batches   603 to  1233,  1,289,486 flows
+    20221123: batches  1233 to  1856,  1,276,378 flows
+    20221124: batches  1856 to  2418,  1,150,593 flows
+    20221125: batches  2418 to  2823,    830,525 flows
+    20221126: batches  2823 to  3004,    370,341 flows
+    20221127: batches  3004 to  3226,    453,654 flows
+  report windows fall in: window_1 -> 20221121; window_2 -> 20221121; window_3 -> 20221121
+  TIME_FIRST
+    non-decreasing   : 0.503649   [pre-registered gate 0.99] -> FAIL
+    backward steps s : p50 7.221, p90 42.41, p99 203.643, p99.9 253.235, max 355.858
+    displacement pos : p50 155, p90 343, p99 1915, p99.9 6035, max 9477   (batch = 2048)
+    beyond one batch : 9.00e-03 of flows
+  TIME_LAST
+    non-decreasing   : 0.506030
+    backward steps s : p50 3.678, p90 15.18, p99 50.025, p99.9 80.035, max 145.15
+    displacement pos : p50 45, p90 107, p99 493, p99.9 1721, max 2414   (batch = 2048)
+    beyond one batch : 5.16e-05 of flows
+  flow duration s    : p50 0.211, p90 25.344, p99 114.439, max 363.586
+  BATCH ORDER        : per-batch median in order for 1.000000 of pairs -> PASS [0.999]
+  DISPLACEMENT       : p99.9 on time_last = 1721 positions (0.8403 batches) -> PASS [< 2048]
+  window_1: batches 0-199, 11.19 h, 2022-11-20T17:58:53.383786 to 2022-11-21T05:10:04.048144
+  window_2: batches 200-399, 4.46 h, 2022-11-21T05:10:05.026402 to 2022-11-21T09:37:43.117492
+  window_3: batches 400-599, 8.12 h, 2022-11-21T09:37:43.423626 to 2022-11-21T17:44:52.343945
+
+==== A0 SUMMARY ====
+  W-2022-46: 2,464 batches, 5,044,543 flows
+      prereg TIME_FIRST 0.504683 FAIL   batch order 1.000000 PASS   displacement p99.9 1574 PASS
+  W-2022-47: 3,227 batches, 6,607,244 flows
+      prereg TIME_FIRST 0.503649 FAIL   batch order 1.000000 PASS   displacement p99.9 1721 PASS
+
+  written to streaming_order_audit.json
+
+  [BATCH-RESOLUTION CRITERIA PASSED]
+  The pre-registered flow-level gate did NOT pass. Read it with the displacement result: the stream is chronological at batch resolution with sub-batch jitter, which is a different claim from flow-exact sorting and is the claim the experiments need. Whether the gate is restated accordingly is a decision for the pre-registration, to be made before it is hash-locked.

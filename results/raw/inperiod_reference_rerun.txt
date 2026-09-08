@@ -1,0 +1,25 @@
+=== FROZEN EVAL on W-2022-45 (W-44 model, no adaptation) ===
+Downloading CESNET-QUIC22-S dataset
+File size: 6.32GB
+Remaining: 6.32GB
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 6.32G/6.32G [04:54<00:00, 23.0MB/s]
+device=cpu
+  n_avail=650, using 200/window
+  window 1: acc = 0.9559
+  window 2: acc = 0.9507
+  window 3: acc = 0.9590
+  W-2022-45: mean = 0.9552 (std 0.0034)
+
+=== FROZEN EVAL on W-2022-46 (W-44 model, no adaptation) ===
+device=cpu
+  n_avail=650, using 200/window
+  window 1: acc = 0.7233
+  window 2: acc = 0.7253
+  window 3: acc = 0.7451
+  W-2022-46: mean = 0.7312 (std 0.0099)
+
+==== SELF-MEASURED IN-PERIOD REFERENCE ====
+  W-45 frozen acc = 0.9552 (cited paper value ~0.867)
+  Recompute gap as: 0.9552 - 0.7287 = 0.2265
+  Then: headline %%-of-gap = 4.34 / 22.65 = 19.2%
+  (Update RESULTS.md and all %-of-gap figures with the self-measured denominator.)

@@ -1,0 +1,127 @@
+=== EXPERIMENT B REPORT on W-2022-47 ===
+    evaluation day 20221121, three report windows (batches 0 to 599)
+      matched: lr=1e-03, steps=100 (selected 2026-09-03T18:52:21)
+         head: lr=1e-03, steps=100 (selected 2026-09-03T18:52:21)
+         full: lr=1e-04, steps=100 (selected 2026-09-03T18:52:21)
+    src-stats: lr=n/a, steps=50 (selected 2026-09-03T18:52:21)
+     src-tent: lr=1e-03, steps=50 (selected 2026-09-03T18:52:21)
+
+device=cpu
+  [ANCHOR OK] frozen windows 0.7224 / 0.7243 / 0.7395
+
+--- delta = 1 day(s): labels from 20221120 ---
+  [WARN] source 20221120 wanted 200 from offset 0, got 198
+  labeled pool: 198 batches (405,504 flows)
+    src-stats k=0: +2.26 / +2.16 / +2.44  (10.4m)   [label-free]
+    src-stats k=1: +2.12 / +2.05 / +2.37  (10.5m)   [label-free]
+    src-stats k=2: +2.14 / +1.99 / +2.32  (10.5m)   [label-free]
+     src-tent k=0: +3.08 / +2.82 / +2.69  (11.9m)   [label-free]
+     src-tent k=1: +3.04 / +2.75 / +2.64  (11.7m)   [label-free]
+     src-tent k=2: +3.04 / +2.78 / +2.69  (11.8m)   [label-free]
+      matched k=0: +14.14 / +13.44 / +13.16  (13.9m)
+    matched+tta k=0: +12.52 / +12.43 / +11.38
+      matched k=1: +14.11 / +13.43 / +13.14  (14.0m)
+      matched k=2: +14.06 / +13.37 / +13.11  (13.9m)
+         head k=0: +11.39 / +10.68 / +10.64  (11.3m)
+    head+tta k=0: +8.18 / +8.68 / +8.41
+         head k=1: +11.55 / +10.87 / +10.83  (11.4m)
+         head k=2: +11.68 / +11.02 / +10.98  (13.9m)
+         full k=0: +14.90 / +14.03 / +13.68  (524.3m)
+    full+tta k=0: +14.13 / +13.45 / +12.99
+
+--- delta = 3 day(s): labels from 20221118 ---
+  labeled pool: 200 batches (409,600 flows)
+    src-stats k=0: +2.70 / +2.63 / +2.99  (13.8m)   [label-free]
+    src-stats k=1: +2.76 / +2.76 / +3.05  (14.0m)   [label-free]
+    src-stats k=2: +2.49 / +2.50 / +2.80  (13.9m)   [label-free]
+     src-tent k=0: +3.26 / +2.89 / +2.57  (15.5m)   [label-free]
+     src-tent k=1: +3.28 / +2.96 / +2.65  (15.5m)   [label-free]
+     src-tent k=2: +3.23 / +2.86 / +2.57  (15.6m)   [label-free]
+      matched k=0: +14.17 / +13.46 / +12.99  (18.4m)
+    matched+tta k=0: +12.38 / +12.15 / +11.33
+      matched k=1: +13.93 / +13.24 / +12.79  (18.4m)
+      matched k=2: +14.04 / +13.33 / +12.90  (18.5m)
+         head k=0: +12.00 / +11.28 / +10.98  (15.0m)
+    head+tta k=0: +8.09 / +8.30 / +8.26
+         head k=1: +11.74 / +11.03 / +10.69  (14.9m)
+         head k=2: +11.84 / +11.12 / +10.85  (14.9m)
+         full k=0: +15.55 / +14.65 / +13.95  (21.6m)
+    full+tta k=0: +14.27 / +13.49 / +12.75
+
+--- delta = 7 day(s): labels from 20221114 ---
+  labeled pool: 200 batches (409,600 flows)
+    src-stats k=0: +1.72 / +1.44 / +1.88  (13.8m)   [label-free]
+    src-stats k=1: +2.43 / +2.19 / +2.65  (13.8m)   [label-free]
+    src-stats k=2: +2.42 / +2.13 / +2.56  (13.8m)   [label-free]
+     src-tent k=0: +2.83 / +2.37 / +2.24  (15.4m)   [label-free]
+     src-tent k=1: +3.26 / +2.79 / +2.67  (15.4m)   [label-free]
+     src-tent k=2: +2.90 / +2.41 / +2.46  (15.4m)   [label-free]
+      matched k=0: +12.58 / +11.92 / +11.63  (18.0m)
+    matched+tta k=0: +11.07 / +11.09 / +10.15
+      matched k=1: +12.74 / +12.08 / +11.76  (18.1m)
+      matched k=2: +12.39 / +11.78 / +11.44  (18.0m)
+         head k=0: +11.74 / +10.97 / +10.56  (14.6m)
+    head+tta k=0: +8.05 / +8.14 / +8.17
+         head k=1: +11.88 / +11.12 / +10.72  (11.2m)
+         head k=2: +11.92 / +11.18 / +10.82  (11.2m)
+         full k=0: +14.27 / +13.39 / +12.88  (16.0m)
+    full+tta k=0: +13.27 / +12.53 / +11.82
+
+==== EXPERIMENT B RESULT: recovery over the frozen model, points ====
+  evaluation: three report windows of 20221121, identical flows for every row
+
+  condition                              w1     w2     w3    mean   K
+  -------------------------------------------------------------------
+  stats-only (episodic)                                      2.43       [recorded]
+  filtered (episodic)                                        3.06       [recorded]
+  filtered (streaming, causal)                               2.88       [recorded]
+  labeled oracle (transductive, unattainable)                        11.55       [recorded]
+
+  delayed-data, LABEL-FREE src-stats, delta=1d   2.17   2.07   2.38    2.21   3
+  delayed-data, LABEL-FREE src-tent, delta=1d   3.05   2.78   2.67    2.84   3
+  delayed-label matched, delta=1d     14.11  13.41  13.13   13.55   3
+  delayed-label head, delta=1d        11.54  10.86  10.82   11.07   3
+  delayed-label full, delta=1d        14.90  14.03  13.68   14.20   1
+  delayed-label matched+tta, delta=1d  12.52  12.43  11.38   12.11   1
+  delayed-label head+tta, delta=1d     8.18   8.68   8.41    8.42   1
+  delayed-label full+tta, delta=1d    14.13  13.45  12.99   13.52   1
+  delayed-data, LABEL-FREE src-stats, delta=3d   2.65   2.63   2.95    2.74   3
+  delayed-data, LABEL-FREE src-tent, delta=3d   3.25   2.90   2.60    2.92   3
+  delayed-label matched, delta=3d     14.04  13.34  12.89   13.43   3
+  delayed-label head, delta=3d        11.86  11.14  10.84   11.28   3
+  delayed-label full, delta=3d        15.55  14.65  13.95   14.72   1
+  delayed-label matched+tta, delta=3d  12.38  12.15  11.33   11.95   1
+  delayed-label head+tta, delta=3d     8.09   8.30   8.26    8.21   1
+  delayed-label full+tta, delta=3d    14.27  13.49  12.75   13.50   1
+  delayed-data, LABEL-FREE src-stats, delta=7d   2.19   1.92   2.36    2.16   3
+  delayed-data, LABEL-FREE src-tent, delta=7d   3.00   2.52   2.46    2.66   3
+  delayed-label matched, delta=7d     12.57  11.93  11.61   12.04   3
+  delayed-label head, delta=7d        11.85  11.09  10.70   11.21   3
+  delayed-label full, delta=7d        14.27  13.39  12.88   13.51   1
+  delayed-label matched+tta, delta=7d  11.07  11.09  10.15   10.77   1
+  delayed-label head+tta, delta=7d     8.05   8.14   8.17    8.12   1
+  delayed-label full+tta, delta=7d    13.27  12.53  11.82   12.54   1
+
+==== KILL RULE B-K1 ====
+  best delayed-label baseline: delayed-label full, delta=3d at +14.72p
+  label-free filtered (episodic, recorded): +3.06p
+  difference: +11.66p (threshold +2.00p)
+
+  *** B-K1 FIRES ***
+  Per the pre-registration, the paper does NOT present label-free adaptation as an operational recommendation. The framing changes, in the abstract and the conclusion, to: label-free test-time adaptation is a stopgap whose value is confined to the interval between the onset of drift and the arrival of labels, and this study measures how small that value is. Report the crossover delta explicitly.
+  deltas at which a baseline clears the margin: [1, 3, 7]
+
+  LABEL-FREE CONTROL ON THE SAME SOURCE DAY
+    best: delayed-data, LABEL-FREE src-tent, delta=3d at +2.92p
+    what the LABELS buy, over label-free adaptation on the same delayed data: +11.80p
+  [B-K4] matched+tta at delta=1d (+12.11p) does not beat matched alone (+13.55p); no combined recommendation is made for it.
+  [B-K4] head+tta at delta=1d (+8.42p) does not beat head alone (+11.07p); no combined recommendation is made for it.
+  [B-K4] full+tta at delta=1d (+13.52p) does not beat full alone (+14.20p); no combined recommendation is made for it.
+  [B-K4] matched+tta at delta=3d (+11.95p) does not beat matched alone (+13.43p); no combined recommendation is made for it.
+  [B-K4] head+tta at delta=3d (+8.21p) does not beat head alone (+11.28p); no combined recommendation is made for it.
+  [B-K4] full+tta at delta=3d (+13.50p) does not beat full alone (+14.72p); no combined recommendation is made for it.
+  [B-K4] matched+tta at delta=7d (+10.77p) does not beat matched alone (+12.04p); no combined recommendation is made for it.
+  [B-K4] head+tta at delta=7d (+8.12p) does not beat head alone (+11.21p); no combined recommendation is made for it.
+  [B-K4] full+tta at delta=7d (+12.54p) does not beat full alone (+13.51p); no combined recommendation is made for it.
+
+  All deltas reported (B-K3). Raw: delayed_label_progress.json

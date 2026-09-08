@@ -1,0 +1,81 @@
+[RESUME] 3 units already done in acrossday_progress.json
+
+=== EXPERIMENT E: across-day replication on W-2022-47 ===
+    frozen config: lr=1e-03, steps=50, q=0.5 (selected on W-2022-46, not revisited here)
+    window = 200 batches = 409,600 flows; K=3; week = 3,227 batches
+
+  20221121: window = batches 0 to 199
+  20221122: window = batches 603 to 802
+  20221123: window = batches 1233 to 1432
+  20221124: window = batches 1856 to 2055
+  20221125: window = batches 2418 to 2617
+  20221126: window = batches 2823 to 3022  [SPILLS 18 batches into the next day]
+  20221127: window = batches 3004 to 3203
+
+device=cpu
+
+  20221121: frozen = 0.7224
+    [3/49] 20221121 stats ord 1: adapted=0.7488 rec=+2.64p (4.1m)
+    [4/49] 20221121 stats ord 2: adapted=0.7486 rec=+2.62p (8.2m)
+    [6/49] 20221121 filtered ord 1: adapted=0.7570 rec=+3.46p (13.7m)
+    [7/49] 20221121 filtered ord 2: adapted=0.7557 rec=+3.33p (19.0m)
+  20221122: frozen = 0.7253
+    [9/49] 20221122 stats ord 0: adapted=0.7498 rec=+2.45p (26.6m)
+    [10/49] 20221122 stats ord 1: adapted=0.7494 rec=+2.40p (30.8m)
+    [11/49] 20221122 stats ord 2: adapted=0.7499 rec=+2.46p (34.9m)
+    [12/49] 20221122 filtered ord 0: adapted=0.7591 rec=+3.38p (40.3m)
+    [13/49] 20221122 filtered ord 1: adapted=0.7589 rec=+3.36p (45.7m)
+    [14/49] 20221122 filtered ord 2: adapted=0.7566 rec=+3.12p (51.0m)
+  20221123: frozen = 0.7296
+    [16/49] 20221123 stats ord 0: adapted=0.7509 rec=+2.13p (58.7m)
+    [17/49] 20221123 stats ord 1: adapted=0.7531 rec=+2.35p (62.9m)
+    [18/49] 20221123 stats ord 2: adapted=0.7504 rec=+2.08p (67.0m)
+    [19/49] 20221123 filtered ord 0: adapted=0.7607 rec=+3.11p (72.5m)
+    [20/49] 20221123 filtered ord 1: adapted=0.7625 rec=+3.29p (79.4m)
+    [21/49] 20221123 filtered ord 2: adapted=0.7601 rec=+3.05p (86.3m)
+  20221124: frozen = 0.7389
+    [23/49] 20221124 stats ord 0: adapted=0.7544 rec=+1.55p (94.8m)
+    [24/49] 20221124 stats ord 1: adapted=0.7579 rec=+1.89p (99.0m)
+    [25/49] 20221124 stats ord 2: adapted=0.7576 rec=+1.87p (103.1m)
+    [26/49] 20221124 filtered ord 0: adapted=0.7676 rec=+2.86p (108.5m)
+    [27/49] 20221124 filtered ord 1: adapted=0.7696 rec=+3.07p (113.8m)
+    [28/49] 20221124 filtered ord 2: adapted=0.7686 rec=+2.97p (119.2m)
+  20221125: frozen = 0.7301
+    [30/49] 20221125 stats ord 0: adapted=0.7517 rec=+2.15p (127.0m)
+    [31/49] 20221125 stats ord 1: adapted=0.7501 rec=+1.99p (131.1m)
+    [32/49] 20221125 stats ord 2: adapted=0.7518 rec=+2.17p (135.3m)
+    [33/49] 20221125 filtered ord 0: adapted=0.7619 rec=+3.17p (140.6m)
+    [34/49] 20221125 filtered ord 1: adapted=0.7571 rec=+2.69p (146.0m)
+    [35/49] 20221125 filtered ord 2: adapted=0.7611 rec=+3.09p (151.4m)
+  20221126: frozen = 0.7597
+    [37/49] 20221126 stats ord 0: adapted=0.7813 rec=+2.16p (159.2m)
+    [38/49] 20221126 stats ord 1: adapted=0.7818 rec=+2.21p (163.3m)
+    [39/49] 20221126 stats ord 2: adapted=0.7809 rec=+2.12p (167.5m)
+    [40/49] 20221126 filtered ord 0: adapted=0.7862 rec=+2.65p (172.8m)
+    [41/49] 20221126 filtered ord 1: adapted=0.7871 rec=+2.73p (178.2m)
+    [42/49] 20221126 filtered ord 2: adapted=0.7866 rec=+2.69p (183.5m)
+  20221127: frozen = 0.7511
+    [44/49] 20221127 stats ord 0: adapted=0.7728 rec=+2.17p (191.4m)
+    [45/49] 20221127 stats ord 1: adapted=0.7737 rec=+2.27p (195.5m)
+    [46/49] 20221127 stats ord 2: adapted=0.7736 rec=+2.26p (199.7m)
+    [47/49] 20221127 filtered ord 0: adapted=0.7780 rec=+2.70p (205.0m)
+    [48/49] 20221127 filtered ord 1: adapted=0.7803 rec=+2.92p (210.4m)
+    [49/49] 20221127 filtered ord 2: adapted=0.7786 rec=+2.75p (215.8m)
+
+==== EXPERIMENT E RESULT ====
+       day   frozen    stats rec   filtered rec  note
+  20221121   0.7224 +2.64 ± 0.02   +3.40 ± 0.05
+  20221122   0.7253 +2.44 ± 0.02   +3.29 ± 0.12
+  20221123   0.7296 +2.18 ± 0.12   +3.15 ± 0.10
+  20221124   0.7389 +1.77 ± 0.16   +2.97 ± 0.08
+  20221125   0.7301 +2.10 ± 0.08   +2.99 ± 0.21
+  20221126   0.7597 +2.16 ± 0.04   +2.69 ± 0.03  window spills 18 batches into the next day
+  20221127   0.7511 +2.23 ± 0.04   +2.79 ± 0.10
+
+  stats: across-day mean +2.22p, across-day std 0.25p over 7 days
+    (the recorded across-window std on 20221121 alone is 0.26p for the filtered condition)
+
+  filtered: across-day mean +3.04p, across-day std 0.24p over 7 days
+    (the recorded across-window std on 20221121 alone is 0.26p for the filtered condition)
+
+  All seven days are reported (E-K1). Raw: acrossday_progress.json

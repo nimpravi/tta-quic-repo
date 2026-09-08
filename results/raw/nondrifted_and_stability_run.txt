@@ -1,0 +1,176 @@
+=====Console output for python scripts/19_w46_stability_reference.py --size S ======
+
+=== EXPERIMENT D: matched stability reference on W-2022-46 ===
+    pure filtered adaptation, lr=1e-03, steps=50, q=0.5, K=5
+    identical 60-batch window and identical seeds to 11_switchpoint_select.py
+    W-2022-47 is not touched
+
+device=cpu
+  [ANCHOR OK] W-46 frozen = 0.7534749348958333  (n=60 batches)
+
+  ordering 0: adapted=0.7781  rec=+2.47p  (3.0m)
+  ordering 1: adapted=0.7775  rec=+2.40p  (6.0m)
+  ordering 2: adapted=0.7774  rec=+2.39p  (9.2m)
+  ordering 3: adapted=0.7791  rec=+2.57p  (12.2m)
+  ordering 4: adapted=0.7764  rec=+2.29p  (15.2m)
+
+==== EXPERIMENT D RESULT ====
+  pure filtered on the W-46 60-batch window, K=5
+  per-ordering: +2.47 / +2.40 / +2.39 / +2.57 / +2.29
+  mean +2.42p, order-std 0.09p
+  (single natural-order reference on this window: +2.68p)
+
+  the value the 0.12p ceiling was set from, measured on W-47 200-batch windows: 0.06p
+  the matched value, measured here on the SAME window the switch-point stds came from: 0.09p
+
+  D-R2: order-std 0.09p EXCEEDS 0.06p. A ceiling built the same way from this matched reference would have been 0.18p, not 0.12p.
+  The selected switch point s*=25 had order-std 0.27p, which still exceeds the matched ceiling 0.18p.
+  Per the pre-registration the recorded outcome is NOT revised, because the selection was executed as written. The manuscript states the mis-calibration and re-justifies the rejection on the evidence that does not depend on the ceiling: single orderings at switch points 62 and 75 drove accuracy below the frozen baseline by 1.28 and 1.13 points, and a method that can underperform doing nothing is not deployable.
+
+  raw: w46_stability_reference.json
+  
+  
+  
+  
+=====Console output for python scripts/18_nondrifted_control.py --c1 --size S --K 3=======
+
+=== EXPERIMENT C1: adaptation applied to NON-DRIFTED traffic ===
+    frozen config lr=1e-03, steps=50, q=0.5
+
+
+--- W-2022-45 ---
+  window 1: frozen = 0.9559
+       stats k=0: 0.9550  -0.09p  (4.0m)
+       stats k=1: 0.9551  -0.09p  (4.0m)
+       stats k=2: 0.9551  -0.09p  (4.0m)
+    filtered k=0: 0.9532  -0.28p  (5.3m)
+    filtered k=1: 0.9533  -0.27p  (5.3m)
+    filtered k=2: 0.9519  -0.40p  (5.2m)
+  window 2: frozen = 0.9507
+       stats k=0: 0.9499  -0.08p  (4.0m)
+       stats k=1: 0.9500  -0.07p  (4.0m)
+       stats k=2: 0.9500  -0.07p  (4.0m)
+    filtered k=0: 0.9478  -0.29p  (5.2m)
+    filtered k=1: 0.9480  -0.27p  (5.3m)
+    filtered k=2: 0.9477  -0.30p  (5.3m)
+  window 3: frozen = 0.9590
+       stats k=0: 0.9586  -0.04p  (4.0m)
+       stats k=1: 0.9585  -0.05p  (4.0m)
+       stats k=2: 0.9587  -0.03p  (4.0m)
+    filtered k=0: 0.9560  -0.30p  (5.2m)
+    filtered k=1: 0.9558  -0.32p  (5.2m)
+    filtered k=2: 0.9560  -0.30p  (5.2m)
+
+  [CAVEAT] W-2022-44 is the week the public weights were trained on. Its test flows overlap the model's training data, so the frozen accuracy below is inflated by memorization. Reported with this caveat, not as a clean control.
+
+--- W-2022-44 ---
+C:\Users\Praveen\Downloads\tent-env\Lib\site-packages\cesnet_datazoo\config.py:345: UserWarning: Some test dates (20221031) are before or equal to the last train date (20221106). This might lead to improper evaluation and should be avoided.
+  warnings.warn(f"Some test dates ({min(test_dates).strftime('%Y%m%d')}) are before or equal to the last train date ({max(train_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
+  window 1: frozen = 0.9497
+       stats k=0: 0.9473  -0.24p  (4.2m)
+       stats k=1: 0.9476  -0.22p  (4.3m)
+       stats k=2: 0.9465  -0.32p  (4.3m)
+    filtered k=0: 0.9471  -0.27p  (5.6m)
+    filtered k=1: 0.9470  -0.28p  (5.6m)
+    filtered k=2: 0.9468  -0.29p  (5.5m)
+  window 2: frozen = 0.9548
+       stats k=0: 0.9520  -0.28p  (4.1m)
+       stats k=1: 0.9508  -0.40p  (4.1m)
+       stats k=2: 0.9453  -0.95p  (4.1m)
+    filtered k=0: 0.9515  -0.33p  (5.3m)
+    filtered k=1: 0.9516  -0.32p  (5.3m)
+    filtered k=2: 0.9450  -0.98p  (5.3m)
+  window 3: frozen = 0.9617
+       stats k=0: 0.9611  -0.05p  (4.0m)
+       stats k=1: 0.9611  -0.06p  (4.0m)
+       stats k=2: 0.9608  -0.09p  (4.0m)
+    filtered k=0: 0.9591  -0.26p  (5.3m)
+    filtered k=1: 0.9581  -0.36p  (5.3m)
+    filtered k=2: 0.9590  -0.27p  (5.3m)
+
+==== C1 RESULT: change in accuracy on non-drifted traffic ====
+        period  window   frozen          stats       filtered
+     W-2022-45       1   0.9559   -0.09 ± 0.00   -0.32 ± 0.06
+     W-2022-45       2   0.9507   -0.07 ± 0.01   -0.29 ± 0.01
+     W-2022-45       3   0.9590   -0.04 ± 0.01   -0.30 ± 0.01
+     W-2022-44       1   0.9497   -0.26 ± 0.04   -0.28 ± 0.01
+     W-2022-44       2   0.9548   -0.54 ± 0.29   -0.55 ± 0.31
+     W-2022-44       3   0.9617   -0.07 ± 0.02   -0.30 ± 0.05
+
+  [C3] pre-registered rule: if adaptation reduces accuracy on non-drifted traffic by more than 0.5 points, that cost is stated in the abstract, not only in the limitations section.
+    worst    stats change on any non-drifted window: -0.54p  -> C3 FIRES: state in the abstract
+    worst filtered change on any non-drifted window: -0.55p  -> C3 FIRES: state in the abstract
+
+=====Console output for python scripts/18_nondrifted_control.py --partition --size S =========
+
+=== BUILDING THE CLASS PARTITION (W-2022-45 and W-2022-46 ONLY) ===
+    rule: affected if recall on W-2022-46 is more than 10 points below recall on the pre-shift windows of W-2022-45
+    windows: first 600 batches of each
+
+    W-45: 200/600 batches (4.7m)
+    W-45: 400/600 batches (9.8m)
+    W-45: 600/600 batches (14.4m)
+    W-46: 200/600 batches (4.5m)
+    W-46: 400/600 batches (9.1m)
+    W-46: 600/600 batches (13.6m)
+
+  affected     : 29 classes, 745,542 W-46 flows
+  unaffected   : 73 classes
+  undetermined : 1 classes
+
+  providers represented in the affected set (reported, not assumed):
+    google: 21 class(es)
+    adavoid: 1 class(es)
+    bitdefender-nimbus: 1 class(es)
+    blitz-gg: 1 class(es)
+    dns-doh: 1 class(es)
+    ebay-kleinanzeigen: 1 class(es)
+    garmin: 1 class(es)
+    toggl: 1 class(es)
+    uber: 1 class(es)
+
+  [note] 3 affected class(es) rest on fewer than 100 flows in one of the two periods; their recall estimates are noisy and this is visible in class_partition.json.
+
+  class_partition.json written.
+  
+  
+=====Console output for python scripts/18_nondrifted_control.py --c2 --size S --K 3 =====
+
+=== EXPERIMENT C2: per-partition effect on W-2022-47 ===
+    partition verified against class_partition.sha256 (64edb551da13da2a...)
+    affected 29 classes, unaffected 73, undetermined 1
+
+  [ANCHOR OK] window 1 frozen = 0.72239013671875
+  window 1 frozen: affected 0.5905 (257,507 flows), unaffected 0.9457 (152,093 flows)
+       stats k=0: affected +7.38p   unaffected -5.31p
+       stats k=1: affected +7.45p   unaffected -5.50p
+       stats k=2: affected +7.53p   unaffected -5.70p
+    filtered k=0: affected +7.20p   unaffected -3.03p
+    filtered k=1: affected +7.28p   unaffected -3.00p
+    filtered k=2: affected +7.18p   unaffected -3.19p
+  window 2 frozen: affected 0.5901 (251,170 flows), unaffected 0.9369 (158,430 flows)
+       stats k=0: affected +6.61p   unaffected -4.56p
+       stats k=1: affected +6.73p   unaffected -4.65p
+       stats k=2: affected +6.93p   unaffected -4.72p
+    filtered k=0: affected +6.38p   unaffected -2.51p
+    filtered k=1: affected +6.34p   unaffected -2.50p
+    filtered k=2: affected +6.46p   unaffected -2.49p
+  window 3 frozen: affected 0.5898 (236,126 flows), unaffected 0.9431 (173,474 flows)
+       stats k=0: affected +7.33p   unaffected -4.56p
+       stats k=1: affected +7.36p   unaffected -4.46p
+       stats k=2: affected +7.30p   unaffected -4.52p
+    filtered k=0: affected +7.21p   unaffected -2.79p
+    filtered k=1: affected +6.96p   unaffected -2.81p
+    filtered k=2: affected +6.82p   unaffected -2.80p
+
+==== C2 RESULT: change in accuracy by class partition ====
+   window  condition       affected     unaffected
+        1      stats          7.45p         -5.50p
+        1   filtered          7.22p         -3.07p
+        2      stats          6.76p         -4.64p
+        2   filtered          6.39p         -2.50p
+        3      stats          7.33p         -4.52p
+        3   filtered          6.99p         -2.80p
+
+  [C3] worst change on the UNAFFECTED partition: -5.50p
+  *** C3 FIRES *** adaptation costs more than 0.5 points on traffic that did not drift. Per the pre-registration this is stated in the abstract, not only in the limitations.

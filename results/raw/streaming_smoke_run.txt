@@ -1,0 +1,20 @@
+*** SMOKE RUN: 20 batches instead of 600. streaming_config.json will NOT be written and no configuration is selected. This run cannot be mistaken for tuning. ***
+
+=== EXPERIMENT A TUNING on W-2022-46 (first 20 batches) ===
+    grid lr x quantile = [0.0001, 0.001] x [0.5, 1.0], condition causal-filtered
+    W-2022-47 IS NOT TOUCHED BY THIS MODE
+
+device=cpu
+
+  lr=1e-04 q=0.5: streaming accuracy 0.8136
+
+  lr=1e-04 q=1.0: streaming accuracy 0.8128
+
+  lr=1e-03 q=0.5: streaming accuracy 0.8112
+
+  lr=1e-03 q=1.0: streaming accuracy 0.8067
+
+  frozen reference on the same batches: 0.7767
+
+
+  [SMOKE] plumbing exercised; nothing written. Rerun without --smoke to select the configuration.

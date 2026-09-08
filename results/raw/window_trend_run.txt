@@ -1,0 +1,49 @@
+PER-WINDOW TREND ANALYSIS, W-2022-47 (all values in accuracy points)
+pre-shift reference = 95.52
+
+frozen baseline per window : 72.24 / 72.43 / 73.95   (monotonically INCREASING: True)
+window-specific gap        : 23.28 / 23.10 / 21.58
+
+condition                  K/win       recovery (p)          % of window gap         adapted acc (p)
+--------------------------------------------------------------------------------------------------------
+stats-only, 50 steps           3    2.64   2.35   2.31  D   11.35  10.17  10.72  .   74.88  74.77  76.26  .
+filtered TENT, 50 steps        5    3.42   2.95   2.81  D   14.67  12.78  13.02  .   75.66  75.38  76.76  .
+unfiltered, 50 steps           3    1.99   1.18   0.78  D    8.53   5.09   3.63  D   74.23  73.60  74.73  .
+filtered TENT, 100 steps       3    3.34   2.82   2.73  D   14.34  12.21  12.63  .   75.58  75.24  76.67  .
+labeled oracle, 50 steps       3   12.02  11.52  11.10  D   51.65  49.86  51.44  .   84.26  83.94  85.04  .
+two-phase (rejected)           3    4.90   4.00   4.02  .   21.04  17.32  18.62  .   77.14  76.43  77.96  .
+
+  'D' marks a monotonically decreasing series across windows 1, 2, 3.
+
+CORRELATION across the three windows (n=3, reported for orientation only;
+  three points cannot support an inference):
+  corr(frozen baseline, recovery)  stats-only, 50 steps       -0.660
+  corr(frozen baseline, recovery)  filtered TENT, 50 steps    -0.750
+  corr(frozen baseline, recovery)  unfiltered, 50 steps       -0.813
+  corr(frozen baseline, recovery)  filtered TENT, 100 steps   -0.693
+  corr(frozen baseline, recovery)  labeled oracle, 50 steps   -0.886
+  corr(frozen baseline, recovery)  two-phase (rejected)       -0.571
+
+READING
+  1. The recovery series decreases across windows in every gradient
+     condition AND in the labeled oracle, which minimizes
+     cross-entropy on ground-truth labels and shares no mechanism
+     with entropy minimization. A trend common to supervised and
+     label-free adaptation is a property of the windows, not of the
+     adaptation signal.
+  2. The frozen baseline RISES across the same three windows. Recovery
+     is a difference against that rising baseline, so a falling
+     recovery and a flat adapted accuracy are the same observation.
+  3. Adapted absolute accuracy is NOT monotone in any condition:
+     window 3 is the best window for every method. There is no
+     downward trend in performance to explain.
+  4. Normalized by each window's own gap, the trend disappears in
+     every condition except unfiltered adaptation, whose damage is
+     expected to scale with the share of high-entropy drifted flows.
+  5. Consistency with the depth trace: the three report windows span
+     test batches 0 to 599 only, and their baseline spread (1.71 p) is
+     smaller than the trendless scatter of the W-47 depth probe
+     (range 4.2 p). Three windows drawn from one early stretch of the
+     week are not evidence of a week-long trend, and a monotone
+     ordering of three exchangeable values occurs by chance one time
+     in six.

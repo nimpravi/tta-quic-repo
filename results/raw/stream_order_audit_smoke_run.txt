@@ -1,0 +1,71 @@
+=== AUDITING W-2022-46 ===
+  day map from test indices: 7 dates, 5,044,543 flows, 2,464 batches expected
+  time column dtype  : datetime64[us]
+  batches / flows    : 20 / 40,960
+  batch sizes seen   : [2048]
+  span (local)       : 2022-11-13T17:58:46 to 2022-11-13T20:09:46  (2.18 h, 18,760 flows/h)
+    [capped] computed over the audited prefix only; a capped run starting at a dataset day boundary samples off-peak traffic and must not be extrapolated
+  day boundaries (from the dataset's own per-date tables):
+    20221114: batches     0 to   588,  1,204,583 flows
+    20221115: batches   588 to  1174,  1,201,414 flows
+    20221116: batches  1174 to  1656,    985,894 flows
+    20221117: batches  1656 to  1852,    402,607 flows
+    20221118: batches  1852 to  2116,    540,187 flows
+    20221119: batches  2116 to  2265,    304,819 flows
+    20221120: batches  2265 to  2463,    405,039 flows
+  report windows placed by the day map:
+    window_1: batches 0-199 -> 20221114
+    window_2: batches 200-399 -> 20221114
+    window_3: batches 400-599 -> 20221114, 20221115
+
+  TIME_FIRST (flow start)
+    non-decreasing   : 0.520398   [pre-registered gate 0.99] -> FAIL
+    backward steps s : p50 12, p90 53, p99 223, p99.9 266, max 314
+    bounded look-back: max 314 s <= 900 s -> PASS
+    large (> 300s): 3 (7.32e-05) -> within 0.001
+  TIME_LAST (flow export, the order a deployment sees)
+    non-decreasing   : 0.528895   [criterion 0.999] -> FAIL
+    backward steps s : p50 8, p90 29, p99 68, max 133
+  flow duration s    : p50 0, p90 26, p99 146, max 345
+  BATCH LEVEL: median TIME_FIRST in order for 1.000000 of batch pairs -> PASS [criterion 0.999]
+
+=== AUDITING W-2022-47 ===
+  day map from test indices: 7 dates, 6,607,244 flows, 3,227 batches expected
+  time column dtype  : datetime64[us]
+  batches / flows    : 20 / 40,960
+  batch sizes seen   : [2048]
+  span (local)       : 2022-11-20T17:58:53 to 2022-11-20T20:24:02  (2.42 h, 16,932 flows/h)
+    [capped] computed over the audited prefix only; a capped run starting at a dataset day boundary samples off-peak traffic and must not be extrapolated
+  day boundaries (from the dataset's own per-date tables):
+    20221121: batches     0 to   603,  1,236,267 flows
+    20221122: batches   603 to  1233,  1,289,486 flows
+    20221123: batches  1233 to  1856,  1,276,378 flows
+    20221124: batches  1856 to  2418,  1,150,593 flows
+    20221125: batches  2418 to  2823,    830,525 flows
+    20221126: batches  2823 to  3004,    370,341 flows
+    20221127: batches  3004 to  3226,    453,654 flows
+  report windows placed by the day map:
+    window_1: batches 0-199 -> 20221121
+    window_2: batches 200-399 -> 20221121
+    window_3: batches 400-599 -> 20221121
+
+  TIME_FIRST (flow start)
+    non-decreasing   : 0.520521   [pre-registered gate 0.99] -> FAIL
+    backward steps s : p50 11, p90 49, p99 225, p99.9 268, max 335
+    bounded look-back: max 335 s <= 900 s -> PASS
+    large (> 300s): 4 (9.77e-05) -> within 0.001
+  TIME_LAST (flow export, the order a deployment sees)
+    non-decreasing   : 0.533021   [criterion 0.999] -> FAIL
+    backward steps s : p50 7, p90 24, p99 67, max 123
+  flow duration s    : p50 0, p90 24, p99 146, max 347
+  BATCH LEVEL: median TIME_FIRST in order for 1.000000 of batch pairs -> PASS [criterion 0.999]
+
+==== A0 SUMMARY ====
+  W-2022-46: 20 batches, 40,960 flows   [CAPPED, not the audit]
+      TIME_FIRST 0.520398 FAIL (prereg)   TIME_LAST 0.528895 FAIL   batch 1.000000 PASS
+  W-2022-47: 20 batches, 40,960 flows   [CAPPED, not the audit]
+      TIME_FIRST 0.520521 FAIL (prereg)   TIME_LAST 0.533021 FAIL   batch 1.000000 PASS
+
+  written to C:/Users/Praveen/AppData/Local/Temp/a0_smoke3.json
+
+  [CAPPED RUN] W-2022-46, W-2022-47. Smoke test, not the audit.
