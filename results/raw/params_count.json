@@ -1,0 +1,14 @@
+{
+ "total": 2261653,
+ "bn_affine": 6400,
+ "head": 61302,
+ "head_module": "classifier",
+ "n_bn": 12,
+ "bn_buffers": 6412,
+ "dropout_modules": [
+  "cnn_global_pooling.3",
+  "mlp_flowstats.8",
+  "mlp_shared.3"
+ ],
+ "weights": "MM_CESNET_V2_Weights.CESNET_QUIC22_Week44"
+}

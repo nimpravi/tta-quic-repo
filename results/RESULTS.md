@@ -1,12 +1,12 @@
 # RESULTS: Label-Free Test-Time Adaptation Under a Documented Drift Event in
 # Encrypted QUIC Traffic Classification
 
-Version 4. This file supersedes all previous versions. Every number in
+Version 5. This file supersedes all previous versions. Every number in
 Sections 1 to 17 was produced by the pipeline in one pinned environment
 (`requirements-lock.txt`: Python 3.12, torch 2.12.1, numpy 2.5.0,
 scikit-learn 1.9.0, cesnet-datazoo 0.2.0, cesnet-models 0.4.1; CPU), and
 every number is regenerated from the released raw artifacts by
-`scripts/21_verify_all.py`, which reports 145 checks passed, 0 failed, 0
+`scripts/21_verify_all.py`, which reports 189 checks passed, 0 failed, 0
 artifacts missing. Section 18 records what that script does not cover.
 
 **What changed in v4.** Five new experiment families (A, B, C, D, E) and one
@@ -18,6 +18,15 @@ did not drift; supervised retraining on labels up to a week old recovers four
 to five times more; and the pre-registered kill rule B-K1 fired, which
 obliges the framing change recorded in Section 13. Several statements in v3
 are corrected in Section 7.
+
+**What changed in v5.** No experiment was run and no measured value changed.
+Four descriptions that were true but incomplete are made precise, and three
+facts derived from released artifacts are added: the parameter counts of the
+three retraining capacities (Section 13), the definition used for the
+break-even prevalence (Section 14.4), and the sensitivity of the class
+partition to its threshold (Section 14.1). Section 7.8 records the
+clarifications. The additions are **not** covered by
+`scripts/21_verify_all.py`; Section 18 says so.
 
 ---
 
@@ -155,7 +164,10 @@ every condition except the **full-network fine-tune** of Experiment B. That
 condition is the only one that calls `m.train()` on the whole model, which
 activates the architecture's three dropout modules
 (`cnn_global_pooling.3`, `mlp_flowstats.8`, `mlp_shared.3`). Dropout draws
-from torch's global RNG, which the pipeline does not seed. Two independent
+from torch's global RNG, which the pipeline does not seed. Since v5 that
+module listing is recorded in `params_count.json` and checked by
+`scripts/21_verify_all.py`, so this exception rests on the architecture
+rather than on a one-time inspection. Two independent
 runs of that condition (scripts 17 and 20) differ by 0.014 to 0.133 points
 against a 14-point effect. The recorded values are **not** revised; both runs
 are released and the pair is reported as an accidental independent
@@ -183,6 +195,26 @@ replication. Every other condition is bit-identical across the two runs.
   is the ddof=1 value; every other standard deviation in this file is ddof=0.
   The ddof=0 value is **0.46**. This file uses 0.46.
 
+### 7.8 Descriptions from v4 that were incomplete (new in v5)
+No measured value changes here. Each item is a description that was true as
+far as it went and misleading if read closely.
+
+- The `head` capacity was described as "BN stats frozen". It retrains the
+  final classification layer with the backbone in evaluation mode and
+  touches no normalization at all, neither the affine parameters nor the
+  statistics. Section 13 now states what each capacity updates, with
+  parameter counts.
+- Section 15 attributed the +0.11 on unaffected traffic to "freezing the
+  statistics". The correct statement is that `head` never moves them.
+  Consequently `head` versus `matched` is a two-variable contrast, and the
+  single-variable isolation of the statistics is `src-stats` versus frozen.
+- Section 8 item 3 said the post-hoc partition units "bit-reproduce
+  Experiment B". They reproduce the corresponding k=0 units. The Section 13
+  entries for the K=3 conditions are means and differ by up to 0.48 points.
+- Section 14.4 gave a break-even prevalence without saying which of three
+  reasonable definitions produced it. It is the mean of the per-window
+  values.
+
 ## 8. Provenance chain
 
 1. Frozen W-47 accuracies are bit-identical across all six Table I and II
@@ -190,8 +222,13 @@ replication. Every other condition is bit-identical across the two runs.
    analysis.
 2. Experiment E's 20221121 units use the same seeds as Table I window 1 and
    bit-reproduce it: +3.405 / +3.460 / +3.332.
-3. The post-hoc partition units bit-reproduce Experiment B for every
-   condition except the full fine-tune (Section 7.6).
+3. Each post-hoc partition unit bit-reproduces the **corresponding k=0
+   unit** of Experiment B for every condition except the full fine-tune
+   (Section 7.6). It does not reproduce the Section 13 table entries for
+   `head`, `matched`, `src-stats` and `src-tent`, because those are K=3
+   means while the partition run holds only k=0; the two differ by up to
+   0.48 points (`src-stats`, delta=7). This is bookkeeping, not
+   disagreement.
 4. The class partition reconstructs Table I exactly from its two parts
    (Section 14).
 5. `PREREGISTRATION_switchpoint.md` was hash-locked before its run.
@@ -199,7 +236,7 @@ replication. Every other condition is bit-identical across the two runs.
    Experiments B, C and D but after A and E; its Section 0.1 records that
    asymmetry, and the manuscript uses the weaker wording for A and E.
 6. `scripts/21_verify_all.py` regenerates every number above from the
-   released artifacts: 145 checks, 0 failures.
+   released artifacts: 189 checks, 0 failures.
 
 ## 9. Matched-capacity labeled reference
 
@@ -276,11 +313,31 @@ delta): 20221120, 20221118 and 20221114 respectively, **all inside the tuning
 week. No W-2022-47 label ever enters training.** All configurations tuned
 inside W-2022-46 and frozen before W-2022-47 was touched.
 
+**What each capacity actually updates** (counts from `scripts/count_params.py`
+on the released weights; model total 2,261,653 parameters):
+
+| Capacity | Updated by gradients | Parameters | BN running statistics |
+|---|---|---|---|
+| `head` | the final `Linear` module, named `classifier`, backbone in `eval()` | 61,302 (2.71%) | **not touched at all** |
+| `matched` | BN affine `{gamma, beta}`, 12 BN modules | 6,400 (0.28%) | move (momentum 0.1) |
+| `full` | every parameter | 2,261,653 (100%) | move (momentum 0.1) |
+
+`head` is **not** a BN-affine condition with frozen statistics. It changes no
+normalization of any kind; the backbone stays in evaluation mode. `matched`
+is the capacity-matched comparison because it is exactly the parameter set
+TTA adapts. The 6,412 BN running buffers are 2 x 3,200 channel statistics
+plus 12 `num_batches_tracked` counters; they are moved by `matched` and
+`full` but never gradient-updated.
+
+Note the inversion: `matched` recovers more overall (+13.00) than `head`
+(+11.19) while updating one tenth as many parameters, and it is the one that
+damages the classes that did not drift.
+
 | Condition | d=1 | d=3 | d=7 | mean | % of gap |
 |---|---|---|---|---|---|
 | src-stats (no labels) | +2.21 | +2.74 | +2.16 | +2.37 | 10.5% |
 | src-tent (no labels) | +2.84 | +2.92 | +2.66 | +2.80 | 12.4% |
-| head (labels, BN stats frozen) | +11.07 | +11.28 | +11.21 | +11.19 | 49.4% |
+| head (labels, classifier layer only) | +11.07 | +11.28 | +11.21 | +11.19 | 49.4% |
 | matched (labels, BN affine + stats) | +13.55 | +13.43 | +12.04 | +13.00 | 57.4% |
 | full (labels, all parameters) | +14.20 | +14.72 | +13.51 | +14.14 | 62.4% |
 | matched + TTA | +12.11 | +11.95 | +10.77 | +11.61 | 51.3% |
@@ -333,6 +390,19 @@ Three non-Google classes also show large drops and are noted rather than
 explained: `dns-doh` (0.994 to 0.592 on 37,000 flows), `garmin` (0.926 to
 0.251), `adavoid` (0.896 to 0.246).
 
+**Threshold sensitivity (added in v5, from `class_partition.json`).** The
+10-point cut was pre-registered, and it does not fall in an empty region of
+the drop distribution. Loosening it barely matters: at 5 points the affected
+set grows to 34 classes but the affected share of W-2022-46 flows moves only
+from 60.7% to 60.9%, because the five added classes carry 2,680 flows
+between them. Tightening it matters a great deal: at 15 points the set falls
+to 21 classes and the affected share falls to 47.9%, and at 20 points to 18
+classes and 41.5%. The swing is dominated by one class, `google-ads`, which
+drops 10.6 points, just over the cut, and carries 94,577 flows, 7.7% of the
+week. **The decomposition has not been recomputed at any other threshold.**
+Doing so is the natural robustness check and would have to be declared
+post-hoc.
+
 ### 14.2 The headline is a net of two large opposing effects
 
 | Window | Condition | Affected | Unaffected | Net | Recorded |
@@ -366,11 +436,16 @@ windows. Its entire benefit is limiting collateral damage.
 
 ### 14.4 Break-even drift prevalence
 
-Solving for the affected fraction at which adaptation nets zero:
-**28.8% for filtered, 40.4% for stats-only.** Below roughly 29% drifted
-traffic, filtered adaptation makes the classifier worse overall. These
-windows sit at 58 to 63%. An operator cannot measure that fraction without
-the labels the method exists to avoid needing.
+Solving f* = -d_unaffected / (d_affected - d_unaffected) for the affected
+fraction at which adaptation nets zero, **per window, then averaging the
+three**: **28.8% for filtered, 40.4% for stats-only.** The per-window values
+are 29.8 / 28.1 / 28.6 and 42.5 / 40.7 / 38.1. The definition matters at the
+second decimal: solving once from the pooled means gives 28.9% and 40.5%,
+and support-weighting gives 28.9% and 40.4%. This file uses the mean of the
+per-window values throughout. Below roughly 29% drifted traffic, filtered
+adaptation makes the classifier worse overall. These windows sit at 58 to
+63%. An operator cannot measure that fraction without the labels the method
+exists to avoid needing.
 
 ### 14.5 This also explains the per-window trend
 
@@ -415,7 +490,7 @@ K=1, declared.
 
 | Condition | Δ affected | Δ unaffected | Labels? | BN stats |
 |---|---|---|---|---|
-| head | +18.30 | **+0.11** | yes | frozen |
+| head (classifier only) | +18.30 | **+0.11** | yes | never touched |
 | matched | +22.13 | -0.91 | yes | moved |
 | full | +23.61 | -0.40 | yes | moved |
 | matched + TTA | +20.25 | -1.69 | yes | moved |
@@ -426,17 +501,24 @@ K=1, declared.
 
 **The collateral damage is specific to label-free adaptation.** Supervised
 retraining gains three times more on drifted traffic and does three to seven
-times less damage to undrifted traffic. Freezing the statistics removes the
-damage entirely.
+times less damage to undrifted traffic. The condition that never moves the
+statistics does no damage at all.
 
-**The mechanism, read down the table.** Moving BN statistics toward a drifted
-mixture is what helps drifted classes and what harms everything else. The
-gradient term is a compensator for that harm: labelled gradients nearly
-eliminate it (-0.91) while tripling the gain, entropy gradients remove about
-half of it (-4.89 to -2.79) at the cost of slightly less gain, and freezing
-the statistics leaves nothing to compensate for (+0.11). This one reading
-accounts for the decomposition in Section 2, the role of filtering in Section
-14.3, the label-free ceiling in Section 13, and why supervision wins.
+**The mechanism.** Moving BN statistics toward a drifted mixture is what
+helps drifted classes and what harms everything else. The clean isolation is
+`src-stats`, which moves the statistics with no gradients anywhere: +7.11 on
+affected, -5.25 on the rest. The gradient term is a compensator for that
+harm: labelled gradients on the same moving statistics nearly eliminate it
+(-0.91) while tripling the gain, and entropy gradients remove about half of
+it (-4.89 to -2.79) at the cost of slightly less gain. `head` never creates
+the displacement in the first place, since it touches no normalization, so
+there is nothing to compensate for (+0.11). This one reading accounts for the
+decomposition in Section 2, the role of filtering in Section 14.3, the
+label-free ceiling in Section 13, and why supervision wins.
+
+Note that `head` versus `matched` is **not** a single-variable contrast: they
+differ both in which parameters receive gradients and in whether the
+statistics move. Only `src-stats` versus frozen isolates the statistics.
 
 **And it explains B-K4.** Stacking adaptation on a retrained model costs 1.88
 points on affected traffic and 0.78 on unaffected: entropy minimization pulls
@@ -466,6 +548,8 @@ fit on exactly the classes supervision had corrected.
 - **Experiment D:** `w46_stability_reference.json`
 - **Experiment E:** `acrossday_progress.json`
 - **Post-hoc:** `delayed_label_partition_progress.json`
+- **Capacity sizes (new in v5):** `params_count.json`, written by
+  `scripts/count_params.py` from the released weights
 - **v2.1 and earlier (unchanged):** `errorbars_progress.json`,
   `bnstats_progress_steps50.json`, `mechanism_progress_steps50.json`,
   `filtered100_progress.json`, `oracle_matched_progress.json`,
@@ -478,11 +562,20 @@ fit on exactly the classes supervision had corrected.
 
 `scripts/21_verify_all.py` regenerates every number in Sections 1 to 15 from
 the released artifacts and compares each against the value recorded here:
-**145 checks passed, 0 failed, 0 artifacts missing.** It loads no model and
+**189 checks passed, 0 failed, 0 artifacts missing.** It loads no model and
 reads no dataset, and runs in seconds.
+
+The v5 additions are outside that coverage: the parameter counts in Section
+13 come from `scripts/count_params.py` against the released weights, and the
+threshold-sensitivity figures in Section 14.1 are computed from
+`class_partition.json`. Neither is checked by `21_verify_all.py`, and adding
+checks for them would be a small, worthwhile change.
 
 A failure would mean the artifact and this file disagree; the script cannot
 say which is wrong. It re-runs no experiment, so it detects an inconsistent
-record and not a wrong experiment. Four artifacts are outside its coverage
-and remain verified only by hand: `collapse_check_q0.5_steps50.json`,
-`leakage_demo.json`, `w45_depth_probe.json`, and `switchpoint_probe.json`.
+record and not a wrong experiment. Three artifacts are outside its coverage
+and remain verified only by hand: `leakage_demo.json`,
+`w45_depth_probe.json`, and `switchpoint_probe.json`.
+`w45_depth_probe.json` backs the drift-onset figure, which is the only
+figure in the manuscript whose numbers this script does not regenerate.
+`collapse_check_q0.5_steps50.json` moved inside coverage in v5.

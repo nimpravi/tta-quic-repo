@@ -19,6 +19,14 @@ WHAT IT DELIBERATELY DOES NOT DO:
   NOT parse, so that "the verification passed" can never be mistaken for "all
   artifacts were checked".
 
+SCOPE NOTE (v5):
+  Sections 12 to 15 were added with RESULTS.md v5. They check the class
+  partition's sensitivity to its threshold, the frozen per-partition
+  accuracies, the collapse diagnostics, and the parameter counts of the three
+  retraining capacities. The parameter counts are read from
+  `params_count.json`, written by `scripts/count_params.py`, so this script
+  still loads no model and reads no dataset.
+
 Run:
     python scripts/21_verify_all.py
     python scripts/21_verify_all.py --verbose
@@ -163,9 +171,9 @@ def main():
         n = 9
         ddof1 = h[1] * np.sqrt(n / (n - 1))
         print(f"  NOTE  two-phase std is {h[1]:.2f}p at ddof=0 and "
-              f"{ddof1:.2f}p at ddof=1. RESULTS.md section 6 records 0.49, "
-              f"which is the ddof=1 value; every other std in the record is "
-              f"ddof=0. Make them consistent.")
+              f"{ddof1:.2f}p at ddof=1. v3 recorded the ddof=1 value; the "
+              f"record now uses ddof=0 throughout (RESULTS.md 7.7), so this "
+              f"line is a standing reminder, not an open discrepancy.")
 
     # ------------------------------------------------------------ Table IV
     sec("3. PRE-REGISTERED SWITCH-POINT SELECTION (Table IV)")
@@ -362,10 +370,35 @@ def main():
         check("C2 filtered loss on unaffected", float(np.mean(dus["filtered"])), -2.79, 0.02, "p")
         check("C2 stats gain on affected", float(np.mean(das["stats"])), 7.18, 0.02, "p")
         check("C2 stats loss on unaffected", float(np.mean(dus["stats"])), -4.89, 0.02, "p")
-        be = {c: float(np.mean([-dus[c][i] / (das[c][i] - dus[c][i]) for i in range(3)]))
+        # RESULTS.md 14.4 defines f* as the MEAN OF THE PER-WINDOW values.
+        # Two other reasonable definitions differ in the second decimal, so
+        # the definition is checked here and not just the result.
+        bw = {c: [-dus[c][i] / (das[c][i] - dus[c][i]) for i in range(3)]
               for c in ("stats", "filtered")}
-        check("break-even drifted fraction, filtered", be["filtered"], 0.288, 0.005)
-        check("break-even drifted fraction, stats-only", be["stats"], 0.404, 0.005)
+        be = {c: float(np.mean(bw[c])) for c in ("stats", "filtered")}
+        check("break-even f*, filtered (mean of per-window)", be["filtered"],
+              0.288, 0.001)
+        check("break-even f*, stats-only (mean of per-window)", be["stats"],
+              0.404, 0.001)
+        for i, e in enumerate((0.298, 0.281, 0.286)):
+            check(f"break-even f*, filtered, window {i+1}", bw["filtered"][i],
+                  e, 0.001)
+        for i, e in enumerate((0.425, 0.407, 0.381)):
+            check(f"break-even f*, stats-only, window {i+1}", bw["stats"][i],
+                  e, 0.001)
+        # the pooled-mean alternative, recorded in 14.4 so the difference is
+        # visible rather than a silent rounding disagreement
+        pool_be = {c: -np.mean(dus[c]) / (np.mean(das[c]) - np.mean(dus[c]))
+                   for c in ("stats", "filtered")}
+        check("break-even f*, filtered, pooled-mean definition",
+              float(pool_be["filtered"]), 0.289, 0.001)
+        check("break-even f*, stats-only, pooled-mean definition",
+              float(pool_be["stats"]), 0.405, 0.001)
+        # frozen accuracy split by partition (RESULTS.md 14.2)
+        fa = float(np.mean([u[f"w{w}_frozen"]["affected"] for w in range(3)]))
+        fu = float(np.mean([u[f"w{w}_frozen"]["unaffected"] for w in range(3)]))
+        check("frozen accuracy on affected classes", fa, 0.5902, 0.0005)
+        check("frozen accuracy on unaffected classes", fu, 0.9419, 0.0005)
 
     # --------------------------------------------------- post-hoc partition
     sec("10. POST-HOC PARTITION OF THE SUPERVISED CONDITIONS (not pre-registered)")
@@ -408,17 +441,100 @@ def main():
                   f"Experiment B bit-for-bit except: {bad or 'nothing'}")
             if bad:
                 print(f"  NOTE  'full' is the only condition that puts the whole "
-                      f"model in training mode. If the architecture contains "
-                      f"dropout, that condition is stochastic and unseeded, and "
-                      f"the repository's determinism claim needs an explicit "
-                      f"exception for it. Verify by listing the model's Dropout "
-                      f"modules; do not assert it without checking.")
+                      f"model in training mode, which activates the "
+                      f"architecture's dropout modules; dropout draws from an "
+                      f"unseeded global RNG, so this condition is stochastic. "
+                      f"Section 13 checks that module listing against "
+                      f"params_count.json, so the exception in RESULTS.md 7.6 "
+                      f"is verified here and not merely asserted.")
+
+    # ------------------------------------------ partition threshold sweep
+    sec("11. CLASS PARTITION: SENSITIVITY TO ITS THRESHOLD (RESULTS 14.1)")
+    if part:
+        C = part["classes"]
+        drop = {k: (C[k]["recall_W45"] - C[k]["recall_W46"])
+                for k in C if C[k]["recall_W45"] is not None}
+        sup = {k: C[k]["support_W46"] for k in drop}
+        tot = sum(sup.values())
+        check("W-2022-46 flows behind the partition", tot, 1228800, 0)
+        for th, n_exp, share_exp in ((0.05, 34, 60.9), (0.10, 29, 60.7),
+                                     (0.15, 21, 47.9), (0.20, 18, 41.5)):
+            sel = [k for k in drop if drop[k] > th]
+            share = 100.0 * sum(sup[k] for k in sel) / tot
+            check(f"threshold {th:.2f}: affected classes", len(sel), n_exp, 0)
+            check(f"threshold {th:.2f}: affected share of flows", share,
+                  share_exp, 0.1, "%")
+        ga = [k for k in drop if C[k]["name"] == "google-ads"]
+        if ga:
+            k = ga[0]
+            check("google-ads recall drop", drop[k], 0.106, 0.001)
+            check("google-ads share of W-46 flows",
+                  100.0 * sup[k] / tot, 7.7, 0.1, "%")
+        thin = sum(1 for c in part["affected"]
+                   if C[str(c)]["support_W46"] < 100)
+        check("affected classes with fewer than 100 flows", thin, 3, 0)
+
+    # ------------------------------------------------- collapse diagnostics
+    sec("12. COLLAPSE DIAGNOSTICS (RESULTS section 4)")
+    cc = load("collapse_check_q0.5_steps50.json")
+    if cc:
+        u = units(cc)
+        keys = sorted(u, key=lambda s: int(s))
+        for i, k in enumerate(keys):
+            v = u[k]
+            check(f"collapse w{i+1} frozen accuracy anchor",
+                  v["acc_frozen"], W47[i], 1e-9)
+            check_exact(f"collapse w{i+1} distinct classes predicted, frozen",
+                        v["distinct_pred_frozen"], 102)
+            check_exact(f"collapse w{i+1} distinct classes predicted, adapted",
+                        v["distinct_pred_adapted"], 102)
+            check_exact(f"collapse w{i+1} prediction entropy rises",
+                        v["pred_entropy_adapted"] > v["pred_entropy_frozen"],
+                        True)
+        dF1 = float(np.mean([(u[k]["macroF1_adapted"] - u[k]["macroF1_frozen"])
+                             * 100 for k in keys]))
+        baseF1 = float(np.mean([u[k]["macroF1_frozen"] for k in keys]))
+        check("macro-F1 change under adaptation", dF1, -0.09, 0.01, "p")
+        check("macro-F1 frozen base", baseF1, 0.80, 0.01)
+
+    # ------------------------------------------------------ capacity sizes
+    sec("13. PARAMETER COUNTS OF THE RETRAINING CAPACITIES (RESULTS 13)")
+    pc = load("params_count.json")
+    if pc:
+        check_exact("model total parameters", pc.get("total"), 2261653)
+        check_exact("'matched' BN affine parameters", pc.get("bn_affine"), 6400)
+        check_exact("'head' classifier parameters", pc.get("head"), 61302)
+        check_exact("BatchNorm modules", pc.get("n_bn"), 12)
+        check_exact("BN running buffers", pc.get("bn_buffers"), 6412)
+        # guards the find_head heuristic: 'head' is defined as the LAST Linear
+        # module in forward order, so if the architecture ever changes, this
+        # says so instead of silently retraining a different layer.
+        check_exact("'head' resolves to the classifier module",
+                    pc.get("head_module"), "classifier")
+        # internal consistency: buffers = 2 x channels + one counter per module
+        if all(pc.get(x) is not None for x in ("bn_affine", "n_bn", "bn_buffers")):
+            check_exact("buffers = affine + one counter per BN module",
+                        pc["bn_buffers"], pc["bn_affine"] + pc["n_bn"])
+        # RESULTS.md 7.6 claims the 'full' condition is non-deterministic
+        # because it activates dropout. That claim is now checked against the
+        # architecture rather than asserted.
+        dro = pc.get("dropout_modules")
+        if dro is not None:
+            check_exact("dropout modules behind the 7.6 determinism exception",
+                        sorted(dro),
+                        sorted(["cnn_global_pooling.3", "mlp_flowstats.8",
+                                "mlp_shared.3"]))
+        else:
+            print("  NOTE  params_count.json predates the dropout listing. "
+                  "Rerun scripts/count_params.py to make the RESULTS.md 7.6 "
+                  "determinism exception machine-checked.")
 
     # ------------------------------------------------------------ coverage
-    sec("11. COVERAGE")
-    not_parsed = ["collapse_check_q0.5_steps50.json (Table III class-level "
-                  "behaviour)", "leakage_demo.json (section III-E audit)",
-                  "w45_depth_probe.json (Figure 2)",
+    sec("14. COVERAGE")
+    not_parsed = ["leakage_demo.json (leakage audit)",
+                  "w45_depth_probe.json (drift-onset figure; the only figure "
+                  "in the manuscript whose numbers this script does not "
+                  "regenerate)",
                   "switchpoint_probe.json (superseded coarse probe)"]
     print("  Artifacts this script does NOT parse, and which therefore remain")
     print("  unverified by it. Check these by hand before submission:")
