@@ -31,6 +31,15 @@ THREE MODES, in this order:
                so the partition cannot be adjusted after seeing a report-week
                number.
 
+               Since the threshold addendum, --c2 also records PER-CLASS flow
+               and correct counts for every unit, frozen and adapted. The
+               partition aggregates it already wrote are unchanged, so the
+               artifact is a strict superset of the recorded one and
+               21_verify_all.py keeps passing. The per-class field makes every
+               alternative partition threshold an offline arithmetic exercise
+               rather than another model run, and it is what
+               scripts/22_threshold_sweep.py consumes.
+
 TWO THINGS THE PRE-REGISTRATION DID NOT SPECIFY, HANDLED LITERALLY:
   1. No minimum class support. The rule is applied as written. Classes with
      zero support in either period have undefined recall and are placed in a
@@ -211,6 +220,15 @@ def adapt(base_model, window, device, cond, order):
         loss = ent[sel].mean() if sel.any() else ent.mean()
         opt.zero_grad(); loss.backward(); opt.step()
     return m
+
+
+def per_class_counts(y, p, n_classes):
+    """Flows per class and correct predictions per class, as plain ints."""
+    total = np.zeros(n_classes, dtype="int64")
+    correct = np.zeros(n_classes, dtype="int64")
+    np.add.at(total, y, 1)
+    np.add.at(correct, y[y == p], 1)
+    return total.tolist(), correct.tolist()
 
 
 def load_ck(p):
@@ -412,6 +430,7 @@ def do_c2(args):
                  f"establish why before recording any number.")
     part = json.load(open(_resolve(PART_JSON)))
     aff = set(part["affected"]); una = set(part["unaffected"])
+    n_classes = max(int(c) for c in part["classes"]) + 1
     print("=== EXPERIMENT C2: per-partition effect on W-2022-47 ===")
     print(f"    partition verified against {PART_SHA} ({actual[:16]}...)")
     print(f"    affected {len(aff)} classes, unaffected {len(una)}, "
@@ -430,6 +449,11 @@ def do_c2(args):
         base = {"affected": float((y[ma] == p[ma]).mean()) if ma.any() else None,
                 "unaffected": float((y[mu] == p[mu]).mean()) if mu.any() else None,
                 "n_affected": int(ma.sum()), "n_unaffected": int(mu.sum())}
+        tot, cor = per_class_counts(y, p, n_classes)
+        base["per_class_total"] = tot
+        base["per_class_correct"] = cor
+        base["n_classes"] = n_classes
+        base["class_partition_sha256"] = actual
         ck["done"][f"w{w}_frozen"] = base; save_ck(C2_CKPT, ck)
         print(f"  window {w+1} frozen: affected {base['affected']:.4f} "
               f"({base['n_affected']:,} flows), unaffected "
@@ -437,14 +461,29 @@ def do_c2(args):
         for cond in ("stats", "filtered"):
             for k in range(args.K):
                 key = f"w{w}_{cond}_{k}"
-                if key in ck["done"]: continue
+                # A unit recorded before the per-class field existed is
+                # recomputed rather than skipped, so a stale checkpoint
+                # cannot leave the artifact half populated.
+                if key in ck["done"] and "per_class_correct" in ck["done"][key]:
+                    continue
                 rng = np.random.default_rng(1000 * w + k)
                 order = list(rng.permutation(len(win)))
                 m = adapt(model, win, device, cond, order)
                 y2, p2 = predict_on_batches(m, win, device)
+                # The window and its order are identical, so the label vector
+                # must be too. If it is not, the per-class totals recorded for
+                # the frozen unit do not describe this unit and nothing below
+                # is comparable.
+                if not np.array_equal(y, y2):
+                    sys.exit(f"[STOP] {key}: label vector differs from the "
+                             f"frozen pass over the same window. The loader is "
+                             f"not returning a stable order; per-class counts "
+                             f"cannot be aligned.")
+                _, cor2 = per_class_counts(y2, p2, n_classes)
                 ck["done"][key] = {
                     "affected": float((y2[ma] == p2[ma]).mean()),
-                    "unaffected": float((y2[mu] == p2[mu]).mean())}
+                    "unaffected": float((y2[mu] == p2[mu]).mean()),
+                    "per_class_correct": cor2}
                 save_ck(C2_CKPT, ck); del m
                 print(f"    {cond:>8} k={k}: affected "
                       f"{(ck['done'][key]['affected']-base['affected'])*100:+.2f}p"
@@ -474,6 +513,11 @@ def do_c2(args):
               f"is stated in the abstract, not only in the limitations.")
     else:
         print(f"  C3 does not fire (threshold {-C3_COST:+.2f}p).")
+
+    print(f"\n  Per-class counts recorded for every unit in {C2_CKPT}. Run")
+    print(f"  scripts/22_threshold_sweep.py for the threshold sweep and the")
+    print(f"  continuous drift-magnitude analysis. The pre-registered 10-point")
+    print(f"  partition results above are unchanged and remain primary.")
 
 
 def main():

@@ -529,8 +529,84 @@ def main():
                   "Rerun scripts/count_params.py to make the RESULTS.md 7.6 "
                   "determinism exception machine-checked.")
 
+    # -------------------------------- per-class structure (RESULTS 19)
+    sec("14. PER-CLASS STRUCTURE OF THE TRANSFER (RESULTS 19, post-hoc)")
+    if c2 and part and "per_class_total" in units(c2).get("w0_frozen", {}):
+        u = units(c2)
+        C = part["classes"]
+        nm = {int(k): v["name"] for k, v in C.items()}
+        idx = {v["name"]: int(k) for k, v in C.items()}
+        n_c = len(C)
+        tot = np.zeros(n_c); cf = np.zeros(n_c)
+        acc = {c: np.zeros(n_c) for c in ("stats", "filtered")}
+        for w in range(3):
+            fz = u[f"w{w}_frozen"]
+            tot += np.asarray(fz["per_class_total"], dtype=float)
+            cf += np.asarray(fz["per_class_correct"], dtype=float)
+            for cond in ("stats", "filtered"):
+                ks = [k for k in range(3) if f"w{w}_{cond}_{k}" in u]
+                acc[cond] += np.mean(
+                    [np.asarray(u[f"w{w}_{cond}_{k}"]["per_class_correct"],
+                                dtype=float) for k in ks], axis=0)
+        aff = set(part["affected"]); una = set(part["unaffected"])
+        ins = idx.get("instagram")
+        if ins is not None:
+            check("instagram frozen accuracy", cf[ins] / tot[ins], 0.9721, 0.0002)
+            check("instagram accuracy after filtered adaptation",
+                  acc["filtered"][ins] / tot[ins], 0.7548, 0.0002)
+            check_exact("instagram flows across the three windows",
+                        int(tot[ins]), 52866)
+            U = [c for c in una if tot[c] > 0]
+            net = acc["filtered"][U].sum() - cf[U].sum()
+            check("instagram share of the filtered loss on unaffected traffic",
+                  (acc["filtered"][ins] - cf[ins]) / net, 0.85, 0.01)
+            for cond, e in (("filtered", -0.46), ("stats", -2.94)):
+                S = [c for c in U if c != ins]
+                check(f"unaffected {cond} loss excluding instagram",
+                      (acc[cond][S].sum() - cf[S].sum()) / tot[S].sum() * 100,
+                      e, 0.02, "p")
+            big = [c for c in U if c != ins and tot[c] >= 1000]
+            for cond, e_med, e_bad in (("filtered", -0.18, 2), ("stats", -1.22, 11)):
+                v = np.array([(acc[cond][c] - cf[c]) / tot[c] * 100 for c in big])
+                check(f"median large unaffected class, {cond}",
+                      float(np.median(v)), e_med, 0.02, "p")
+                check_exact(f"large unaffected classes below -5p, {cond}",
+                            int((v < -5).sum()), e_bad)
+        A = [c for c in aff if tot[c] > 0]
+        harmed = [c for c in A if acc["filtered"][c] < cf[c]]
+        check_exact("affected classes harmed by filtered adaptation",
+                    len(harmed), 10)
+        gw = idx.get("google-www")
+        if gw is not None:
+            check("google-www under filtered adaptation",
+                  (acc["filtered"][gw] - cf[gw]) / tot[gw] * 100, -9.54, 0.02, "p")
+
+    # ------------------------------------ threshold sweep (RESULTS 19.1)
+    sec("15. PARTITION THRESHOLD SWEEP (RESULTS 19.1, post-hoc)")
+    ts = load("threshold_sweep.json")
+    if ts:
+        exp = {"0.05": (60.8, 6.84, -2.79, 28.9), "0.1": (60.6, 6.87, -2.79, 28.8),
+               "0.125": (52.4, 7.12, -1.38, 16.0), "0.15": (47.9, 8.22, -1.68, 16.9),
+               "0.2": (41.7, 7.97, -0.44, 5.1)}
+        for k, (ef, ea, eu, es) in exp.items():
+            r = ts["sweep"].get(k)
+            if not r:
+                FAIL.append(f"threshold {k} missing from threshold_sweep.json")
+                continue
+            check(f"sweep {k}: affected share of flows", r["f"] * 100, ef, 0.1, "%")
+            check(f"sweep {k}: filtered on affected",
+                  r["filtered"]["d_affected"], ea, 0.02, "p")
+            check(f"sweep {k}: filtered on unaffected",
+                  r["filtered"]["d_unaffected"], eu, 0.02, "p")
+            check(f"sweep {k}: break-even", r["filtered"]["f_star"] * 100, es, 0.1, "%")
+            # R1 and R3 of the addendum, checked rather than asserted
+            check_exact(f"sweep {k}: R1, loss on unaffected stays negative",
+                        r["filtered"]["d_unaffected"] < 0, True)
+            check_exact(f"sweep {k}: R3, operating point above break-even",
+                        r["f"] > r["filtered"]["f_star"], True)
+
     # ------------------------------------------------------------ coverage
-    sec("14. COVERAGE")
+    sec("16. COVERAGE")
     not_parsed = ["leakage_demo.json (leakage audit)",
                   "w45_depth_probe.json (drift-onset figure; the only figure "
                   "in the manuscript whose numbers this script does not "

@@ -1,0 +1,52 @@
+========================================================================
+0. ANCHOR: the pre-registered partition must reproduce from counts
+========================================================================
+      stats: affected +7.18p (recorded +7.18), unaffected -4.89p (recorded -4.89)  OK
+   filtered: affected +6.87p (recorded +6.87), unaffected -2.79p (recorded -2.79)  OK
+  Reproduced. The rerun is comparable with the record.
+
+========================================================================
+1. THRESHOLD SWEEP (post-hoc)
+========================================================================
+     thr  classes       f   stats aff   stats unaff      f* filtered aff filtered unaff      f*
+   0.050       34   60.8%        7.14         -4.88   40.5%        6.84         -2.79   28.9%
+   0.075       31   60.7%        7.17         -4.89   40.5%        6.87         -2.80   28.9%
+   0.100       29   60.6%        7.18         -4.89   40.4%        6.87         -2.79   28.8% <- pre-registered
+   0.125       24   52.4%        8.37         -4.11   32.8%        7.12         -1.38   16.0%
+   0.150       21   47.9%        9.92         -4.47   31.0%        8.22         -1.68   16.9%
+   0.200       18   41.7%       10.45         -3.31   23.9%        7.97         -0.44    5.1%
+   0.250       17   41.6%       10.45         -3.31   23.9%        7.97         -0.44    5.1%
+
+========================================================================
+2. THE CONTINUOUS VERSION: per-class effect against drift magnitude
+========================================================================
+      stats, classes with >=     0 flows (n=102): Spearman rho = +0.274
+      stats, classes with >=   100 flows (n= 87): Spearman rho = +0.326
+      stats, classes with >=  1000 flows (n= 43): Spearman rho = +0.537
+   filtered, classes with >=     0 flows (n=102): Spearman rho = +0.278
+   filtered, classes with >=   100 flows (n= 87): Spearman rho = +0.371
+   filtered, classes with >=  1000 flows (n= 43): Spearman rho = +0.480
+
+  Ten most drifted classes and what adaptation does to each:
+    class                      drift    stats  filtered    flows
+    google-fonts               77.9p  +13.06   +6.14    20967
+    google-gstatic             74.9p   +9.31   +0.04    23350
+    garmin                     67.5p   -8.45   -1.13      828
+    adavoid                    65.0p  -25.99   -8.07       62
+    google-imasdk              61.2p   +8.05   +5.11     2137
+    google-www                 58.4p   -1.77   -9.56    32484
+    google-hangouts            56.0p  +34.97  +30.04      185
+    blogger                    50.3p   +5.62   +3.90      167
+    google-scholar             43.8p  +23.54  +26.40      532
+    dns-doh                    40.2p  +11.86  +34.84    12258
+
+========================================================================
+3. ADDENDUM DECISION RULES
+========================================================================
+  R1 sign            : holds; the filtered loss on unaffected traffic stays negative at every swept cut
+  R2 magnitude       : filtered loss at 0.15 is -1.68p  -> holds
+  R3 operating point : holds at every swept cut
+  R4 mechanism       : read the Spearman values in section 2; the rule asks for a positive rank correlation.
+  R5                 : the pre-registered 10-point results stand as primary; nothing above replaces Table II.
+
+  written to threshold_sweep.json

@@ -1,0 +1,105 @@
+{
+ "declared": "post-hoc, ADDENDUM_partition_threshold.md",
+ "prereg_threshold": 0.1,
+ "min_support": 0,
+ "sweep": {
+  "0.05": {
+   "f": 0.6081087239583334,
+   "n_affected_classes": 34,
+   "stats": {
+    "d_affected": 7.135659791474232,
+    "d_unaffected": -4.877850663445506,
+    "f_star": 0.4054779037036225
+   },
+   "filtered": {
+    "d_affected": 6.838532706761046,
+    "d_unaffected": -2.788839654816686,
+    "f_star": 0.2892618842207581
+   }
+  },
+  "0.075": {
+   "f": 0.6067244466145834,
+   "n_affected_classes": 31,
+   "stats": {
+    "d_affected": 7.1711275730028605,
+    "d_unaffected": -4.890953232738382,
+    "f_star": 0.40491026513914613
+   },
+   "filtered": {
+    "d_affected": 6.866301909831859,
+    "d_unaffected": -2.7982918041892195,
+    "f_star": 0.28913905858097716
+   }
+  },
+  "0.1": {
+   "f": 0.6061222330729167,
+   "n_affected_classes": 29,
+   "stats": {
+    "d_affected": 7.180019206809054,
+    "d_unaffected": -4.887019525611048,
+    "f_star": 0.40439746890966594
+   },
+   "filtered": {
+    "d_affected": 6.8694440048008545,
+    "d_unaffected": -2.7891968190430667,
+    "f_star": 0.28837231949320846
+   }
+  },
+  "0.125": {
+   "f": 0.5236360677083334,
+   "n_affected_classes": 24,
+   "stats": {
+    "d_affected": 8.36542367451384,
+    "d_unaffected": -4.105981399202901,
+    "f_star": 0.328446929154919
+   },
+   "filtered": {
+    "d_affected": 7.1179909071490535,
+    "d_unaffected": -1.3835115886064255,
+    "f_star": 0.16021343653291012
+   }
+  },
+  "0.15": {
+   "f": 0.47941650390624996,
+   "n_affected_classes": 21,
+   "stats": {
+    "d_affected": 9.916998003532756,
+    "d_unaffected": -4.474197987653885,
+    "f_star": 0.3101263211984655
+   },
+   "filtered": {
+    "d_affected": 8.215950010109943,
+    "d_unaffected": -1.6818888112060473,
+    "f_star": 0.16907550867198617
+   }
+  },
+  "0.2": {
+   "f": 0.4165730794270834,
+   "n_affected_classes": 18,
+   "stats": {
+    "d_affected": 10.451177149580507,
+    "d_unaffected": -3.3073309795005907,
+    "f_star": 0.23919131590069506
+   },
+   "filtered": {
+    "d_affected": 7.969872700899432,
+    "d_unaffected": -0.44184534394352676,
+    "f_star": 0.05104697827517357
+   }
+  },
+  "0.25": {
+   "f": 0.4164835611979167,
+   "n_affected_classes": 17,
+   "stats": {
+    "d_affected": 10.454938701483647,
+    "d_unaffected": -3.307966925039745,
+    "f_star": 0.23915816508920681
+   },
+   "filtered": {
+    "d_affected": 7.9737548694054015,
+    "d_unaffected": -0.4433711039895279,
+    "f_star": 0.05120588064068065
+   }
+  }
+ }
+}

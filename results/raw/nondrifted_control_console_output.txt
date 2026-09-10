@@ -1,0 +1,43 @@
+=== EXPERIMENT C2: per-partition effect on W-2022-47 ===
+    partition verified against class_partition.sha256 (64edb551da13da2a...)
+    affected 29 classes, unaffected 73, undetermined 1
+
+  [ANCHOR OK] window 1 frozen = 0.72239013671875
+  window 1 frozen: affected 0.5905 (257,507 flows), unaffected 0.9457 (152,093 flows)
+       stats k=0: affected +7.38p   unaffected -5.31p
+       stats k=1: affected +7.45p   unaffected -5.50p
+       stats k=2: affected +7.53p   unaffected -5.70p
+    filtered k=0: affected +7.20p   unaffected -3.03p
+    filtered k=1: affected +7.28p   unaffected -3.00p
+    filtered k=2: affected +7.18p   unaffected -3.19p
+  window 2 frozen: affected 0.5901 (251,170 flows), unaffected 0.9369 (158,430 flows)
+       stats k=0: affected +6.61p   unaffected -4.56p
+       stats k=1: affected +6.73p   unaffected -4.65p
+       stats k=2: affected +6.93p   unaffected -4.72p
+    filtered k=0: affected +6.38p   unaffected -2.51p
+    filtered k=1: affected +6.34p   unaffected -2.50p
+    filtered k=2: affected +6.46p   unaffected -2.49p
+  window 3 frozen: affected 0.5898 (236,126 flows), unaffected 0.9431 (173,474 flows)
+       stats k=0: affected +7.33p   unaffected -4.56p
+       stats k=1: affected +7.36p   unaffected -4.46p
+       stats k=2: affected +7.30p   unaffected -4.52p
+    filtered k=0: affected +7.21p   unaffected -2.79p
+    filtered k=1: affected +6.96p   unaffected -2.81p
+    filtered k=2: affected +6.82p   unaffected -2.80p
+
+==== C2 RESULT: change in accuracy by class partition ====
+   window  condition       affected     unaffected
+        1      stats          7.45p         -5.50p
+        1   filtered          7.22p         -3.07p
+        2      stats          6.76p         -4.64p
+        2   filtered          6.39p         -2.50p
+        3      stats          7.33p         -4.52p
+        3   filtered          6.99p         -2.80p
+
+  [C3] worst change on the UNAFFECTED partition: -5.50p
+  *** C3 FIRES *** adaptation costs more than 0.5 points on traffic that did not drift. Per the pre-registration this is stated in the abstract, not only in the limitations.
+
+  Per-class counts recorded for every unit in nondrifted_c2_progress.json. Run
+  scripts/22_threshold_sweep.py for the threshold sweep and the
+  continuous drift-magnitude analysis. The pre-registered 10-point
+  partition results above are unchanged and remain primary.

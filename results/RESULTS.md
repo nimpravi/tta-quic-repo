@@ -1,12 +1,12 @@
 # RESULTS: Label-Free Test-Time Adaptation Under a Documented Drift Event in
 # Encrypted QUIC Traffic Classification
 
-Version 5. This file supersedes all previous versions. Every number in
+Version 6. This file supersedes all previous versions. Every number in
 Sections 1 to 17 was produced by the pipeline in one pinned environment
 (`requirements-lock.txt`: Python 3.12, torch 2.12.1, numpy 2.5.0,
 scikit-learn 1.9.0, cesnet-datazoo 0.2.0, cesnet-models 0.4.1; CPU), and
 every number is regenerated from the released raw artifacts by
-`scripts/21_verify_all.py`, which reports 189 checks passed, 0 failed, 0
+`scripts/21_verify_all.py`, which reports 231 checks passed, 0 failed, 0
 artifacts missing. Section 18 records what that script does not cover.
 
 **What changed in v4.** Five new experiment families (A, B, C, D, E) and one
@@ -27,6 +27,14 @@ break-even prevalence (Section 14.4), and the sensitivity of the class
 partition to its threshold (Section 14.1). Section 7.8 records the
 clarifications. The additions are **not** covered by
 `scripts/21_verify_all.py`; Section 18 says so.
+
+**What changed in v6.** Experiment C's C2 stage was rerun under
+`ADDENDUM_partition_threshold.md`, hash-locked first, recording per-class
+counts so that any partition threshold can be evaluated offline. The rerun
+reproduces every recorded value. All five addendum rules hold, so no
+pre-registered result is revised. The per-class counts then showed something
+the aggregates hid, recorded in Section 19: **85% of the filtered method's
+loss on undrifted traffic falls on one class.**
 
 ---
 
@@ -236,7 +244,7 @@ far as it went and misleading if read closely.
    Experiments B, C and D but after A and E; its Section 0.1 records that
    asymmetry, and the manuscript uses the weaker wording for A and E.
 6. `scripts/21_verify_all.py` regenerates every number above from the
-   released artifacts: 189 checks, 0 failures.
+   released artifacts: 231 checks, 0 failures.
 
 ## 9. Matched-capacity labeled reference
 
@@ -550,6 +558,10 @@ fit on exactly the classes supervision had corrected.
 - **Post-hoc:** `delayed_label_partition_progress.json`
 - **Capacity sizes (new in v5):** `params_count.json`, written by
   `scripts/count_params.py` from the released weights
+- **Threshold robustness (new in v6):** `threshold_sweep.json`, and the
+  `per_class_total` / `per_class_correct` fields added to
+  `nondrifted_c2_progress.json`. The earlier fields are unchanged, so the
+  artifact is a strict superset of the one v4 and v5 described.
 - **v2.1 and earlier (unchanged):** `errorbars_progress.json`,
   `bnstats_progress_steps50.json`, `mechanism_progress_steps50.json`,
   `filtered100_progress.json`, `oracle_matched_progress.json`,
@@ -562,10 +574,13 @@ fit on exactly the classes supervision had corrected.
 
 `scripts/21_verify_all.py` regenerates every number in Sections 1 to 15 from
 the released artifacts and compares each against the value recorded here:
-**189 checks passed, 0 failed, 0 artifacts missing.** It loads no model and
+**231 checks passed, 0 failed, 0 artifacts missing.** It loads no model and
 reads no dataset, and runs in seconds.
 
-The v5 additions are outside that coverage: the parameter counts in Section
+The v6 additions are inside it: sections 14 and 15 of the script check the
+per-class findings of Section 19 and every row of the threshold sweep,
+including rules R1 and R3 of the addendum, which are now verified rather
+than asserted. The v5 additions are outside that coverage: the parameter counts in Section
 13 come from `scripts/count_params.py` against the released weights, and the
 threshold-sensitivity figures in Section 14.1 are computed from
 `class_partition.json`. Neither is checked by `21_verify_all.py`, and adding
@@ -576,6 +591,77 @@ say which is wrong. It re-runs no experiment, so it detects an inconsistent
 record and not a wrong experiment. Three artifacts are outside its coverage
 and remain verified only by hand: `leakage_demo.json`,
 `w45_depth_probe.json`, and `switchpoint_probe.json`.
-`w45_depth_probe.json` backs the drift-onset figure, which is the only
-figure in the manuscript whose numbers this script does not regenerate.
+`w45_depth_probe.json` backs the drift-onset probe behind the manuscript's
+denominator argument, the only claim there whose numbers this script does
+not regenerate.
 `collapse_check_q0.5_steps50.json` moved inside coverage in v5.
+
+## 19. Per-class structure of the transfer (post-hoc, declared)
+
+Declared post-hoc under `ADDENDUM_partition_threshold.md`, hash-locked
+before the rerun. Nothing here revises Section 14; R5 of the addendum
+forbids it.
+
+### 19.1 The threshold is not load-bearing
+
+Recomputed from the per-class counts at every cut
+(`scripts/22_threshold_sweep.py`, `threshold_sweep.json`):
+
+| Threshold | Affected classes | f | filtered affected | filtered unaffected | f* |
+|---|---|---|---|---|---|
+| 0.05 | 34 | 60.8% | +6.84 | -2.79 | 28.9% |
+| **0.10 (pre-registered)** | **29** | **60.6%** | **+6.87** | **-2.79** | **28.8%** |
+| 0.125 | 24 | 52.4% | +7.12 | -1.38 | 16.0% |
+| 0.15 | 21 | 47.9% | +8.22 | -1.68 | 16.9% |
+| 0.20 | 18 | 41.7% | +7.97 | -0.44 | 5.1% |
+
+R1 to R4 all hold. The sign never changes; the operating point stays above
+break-even at every cut with the margin between 31 and 37 points; the gain
+on the affected side **rises** as the cut tightens, which is the
+dose-response the mechanism predicts; and per-class drift magnitude
+correlates positively with per-class benefit at every support floor
+(Spearman +0.27 / +0.33 / +0.54 for stats, +0.28 / +0.37 / +0.48 for
+filtered, at floors of 0, 100 and 1000 flows). The correlation is moderate,
+not tight, and is reported as such.
+
+The one non-monotone step, -1.38 at 0.125 rising to -1.68 at 0.15, has a
+named cause: `google-usercontent` (37,647 flows, filtered -6.54) leaves the
+affected group at 0.15 and takes its loss with it.
+
+### 19.2 The loss is a tail, not a tax
+
+| Condition | All 73 unaffected | Excluding `instagram` | Median of the 40 largest | Large classes below -5p |
+|---|---|---|---|---|
+| statistics only | -4.87 | **-2.94** | -1.22 | 11 of 40 |
+| filtered | -2.79 | **-0.46** | -0.18 | 2 of 40 |
+
+`instagram` has 0.2 points of drift, which is what unaffected means. Under
+filtered adaptation it falls from **0.9721 to 0.7548** on 52,866 flows, in
+every window and at every seed (0.9749 to 0.727, 0.9733 to 0.762, 0.9688 to
+0.771). Those 11,490 misclassified flows are **85% of the net 13,483 lost
+across all 73 unaffected classes**.
+
+The two conditions therefore fail differently, and the aggregate -2.79
+describes neither. Recalibration is a broad tax. Entropy filtering removes
+most of the broad tax and converts what remains into a tail.
+
+### 19.3 The affected group is heterogeneous too
+
+Of the 29 affected classes, 18 are helped (458k flows) and 10 are harmed
+(286k). Six classes supply 87% of the gross gain. The largest affected
+class, `google-www`, 97,454 flows and a 58-point drift, **loses 9.54
+points** under filtered adaptation; `youtube` loses 6.50; `google-gstatic`,
+which recalibration lifts 9.28 points, ends at -0.08 once the gradient term
+is added.
+
+Filtering's aggregate cost of 0.31 points on affected traffic (Section 14.3)
+is itself a residue: -9.4 on `google-gstatic`, -7.8 on `google-www`, -8.2 on
+`youtube`, against +23.0 on `dns-doh`. **At every level of aggregation in
+this study, the reported number is a small residue of large opposing
+per-class effects.**
+
+### 19.4 What is not known
+
+The confusion target is not recorded. `instagram` falls to 0.755; which
+class absorbs it is unmeasured, and identifying it would need a confusion
+matrix from another C2 pass.
