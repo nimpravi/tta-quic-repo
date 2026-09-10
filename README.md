@@ -15,14 +15,16 @@ classifier meets a real, documented distribution shift.
 
 ## TL;DR
 
-A public QUIC classifier (MM-CESNET-V2, trained on week W-2022-44 of
-CESNET-QUIC22) loses **22.65 accuracy points** when Google changed its TLS
-certificates mid-week W-45. This repository measures what label-free
-test-time adaptation recovers, what it costs, and how it compares to the
-alternative an operator actually has.
+## TL;DR
 
-Under a leakage-clean protocol with all hyperparameters frozen on W-46 before
-W-47 is touched:
+A public QUIC classifier (MM-CESNET-V2, trained on week W-2022-44 of
+CESNET-QUIC22) loses **22.65 accuracy points** when Google changed the TLS
+certificates of its services during W-2022-45. This repository measures what
+label-free test-time adaptation recovers, what it costs, who pays that cost,
+and how it compares to the alternative an operator actually has.
+
+Under a leakage-clean protocol with every hyperparameter frozen on W-2022-46
+before W-2022-47 is touched:
 
 | Condition (episodic, 50 steps) | Recovery | % of gap |
 |---|---|---|
@@ -30,31 +32,35 @@ W-47 is touched:
 | + filtered entropy gradients (q = 0.5) | **+3.06 ± 0.27 p** | 13.5% |
 | + unfiltered entropy gradients (q = 1.0) | **+1.32 ± 0.53 p** | 5.8% |
 
-**That +3.06 is a net of two large opposing effects.** Split by whether a
-class was affected by the certificate change, it is a gain of about **+6.9
-points on drifted traffic** and a loss of **2.8 points on traffic that did
-not drift**. Below roughly **29 percent** drift prevalence, adaptation makes
-the classifier worse overall, and prevalence cannot be measured without the
-labels the method exists to avoid needing.
+**That +3.06 is a net of two large opposing effects.** Split by a class
+partition built from pre-report weeks and hash-locked before the report week
+was touched, it is a gain of **+6.87 points on drifted classes** and a loss
+of **2.79 points on classes that did not drift**. Below roughly **29 percent**
+drift prevalence the method is net harmful overall, and prevalence cannot be
+measured without the labels the method exists to avoid needing.
 
-**Supervised retraining on stale labels does four to five times better.**
-Retraining on labels 1, 3 or 7 days old recovers **+11.07 to +14.72 points**,
-at every delay tested, and does three to seven times less damage to
-non-drifted traffic. A pre-registered kill rule fired on this comparison. The
-value of label-free adaptation is confined to the interval between drift
-onset and the arrival of the first post-drift labels.
+**The loss is a tail, not a tax.** Per-class counts show recalibration
+imposing a broad cost (median large undrifted class loses 1.22 points) and
+entropy filtering removing most of it (median 0.18) while leaving one
+catastrophic case. `instagram`, with 0.2 points of drift, falls from
+**0.9721 to 0.7548** accuracy on 52,866 flows and accounts for **85 percent**
+of the filtered method's net loss on undrifted traffic. Excluding it, that
+loss is 0.46 points. No collapse diagnostic detects any of this: aggregate
+accuracy rises, macro-F1 stays flat, and all 102 classes remain predicted.
 
-Other findings:
+**Supervised retraining on stale labels does three to five times better.**
+Labels 1, 3 or 7 days old recover **+11.07 to +14.72 points** at every delay
+tested, with three to seven times less collateral damage, and retraining only
+the classifier leaves undrifted traffic untouched (+0.11). A pre-registered
+kill rule fired on this comparison. The operational quantity is not label
+age, which costs at most 1.5 points across a week, but the interval between
+drift onset and the first post-drift labels.
 
-- Strict causality is nearly free. Streaming, with no buffering and every
-  flow classified before the model has seen it, recovers +2.88 points on the
-  three report windows and +2.63 over a full week of 6.6 million flows.
-- Entropy filtering does not improve recovery on drifted traffic. It makes it
-  slightly worse. Its entire benefit is limiting collateral damage.
-- Do not stack adaptation on a freshly retrained model. It hurt in all nine
-  conditions tested.
-- The headline holds across seven days (+3.04 ± 0.24), not just the one day
-  the original three windows turned out to occupy.
+**It is not an artifact of the protocol.** Strictly causal streaming costs
+0.18 points against the transductive headline; the result replicates across
+seven days at +3.04 ± 0.24; and the partition threshold is not load-bearing,
+with the sign of the transfer and the operating point above break-even
+holding at every cut from 5 to 20 points.
 
 Full numbers, kill-rule outcomes and the correction record:
 [`results/RESULTS.md`](results/RESULTS.md).
@@ -91,6 +97,29 @@ the only one that puts the whole model in training mode and therefore
 activates its three dropout layers. Torch's global RNG is not seeded. Two
 independent runs of that condition differ by 0.014 to 0.133 points; both are
 released.
+
+---
+
+## Verification
+
+```bash
+python scripts/21_verify_all.py
+```
+
+Regenerates every number in the manuscript from the released artifacts and
+compares each against the value recorded in `results/RESULTS.md`. It loads no
+model, reads no dataset, and runs in seconds. Current state: **231 checks
+passed, 0 failed, 0 artifacts missing.**
+
+A failure means an artifact and the record disagree; the script cannot say
+which is wrong. It re-runs no experiment, so it detects an inconsistent
+record, not a wrong experiment. It also names, in its own output, the three
+artifacts it does not parse, so that "verification passed" can never be read
+as "everything was checked".
+
+Two claims that used to rest on hand inspection are now checked here: the
+dropout modules behind the determinism exception in RESULTS.md 7.6, and the
+identity of the module the `head` capacity retrains.
 
 ---
 
@@ -263,6 +292,8 @@ torch checkpoints). Timings are measured, not estimated.
 | Partition report (C2) | `python scripts/18_nondrifted_control.py --c2 --size S --K 3` | ~1 h |
 | Stability reference (D) | `python scripts/19_w46_stability_reference.py --size S` | 15 min |
 | Post-hoc partition | `python scripts/20_delayed_label_partition.py --size S --combined` | 4.5 h |
+| Capacity sizes | `python scripts/count_params.py` | seconds |
+| Threshold sweep | `python scripts/22_threshold_sweep.py` | seconds |
 | Verify everything | `python scripts/21_verify_all.py` | seconds |
 
 Two steps are gated deliberately and will refuse to run out of order.
@@ -272,6 +303,16 @@ cannot be touched before the configuration is selected on the tuning week.
 `18_nondrifted_control.py --c2` requires `class_partition.sha256` to exist
 and match `class_partition.json`, so the class partition cannot be adjusted
 after a report-week number exists.
+
+Between `--partition` and `--c2` you must hash `class_partition.json` into
+`class_partition.sha256` and commit both. `--c2` verifies the digest and
+refuses to run otherwise, so the partition cannot be adjusted after a
+report-week number exists.
+
+`22_threshold_sweep.py` writes `threshold_sweep.json` into the working
+directory. Move it into `results/raw/` before committing, or the verifier
+will read the fresh copy in preference to the committed one and the two can
+drift apart silently.
 
 **Determinism.** The pipeline is bit-deterministic within a process except as
 noted in the self-audit section. "Seeds" vary the one genuine stochastic

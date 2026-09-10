@@ -7,6 +7,103 @@ evidence for it, is in [`results/RESULTS.md`](results/RESULTS.md) section 7.
 
 ---
 
+## v6 (2026-09-10)
+
+Experiment C's C2 stage rerun under `ADDENDUM_partition_threshold.md`,
+hash-locked before the run. No measured value changed and no pre-registered
+result was revised. The per-class counts the rerun added then showed
+something the aggregates had hidden.
+
+**Changed:**
+
+- `scripts/18_nondrifted_control.py` `--c2` now records `per_class_total` and
+  `per_class_correct` for every unit. The earlier aggregate fields are
+  untouched, so `nondrifted_c2_progress.json` is a strict superset of the
+  artifact v4 and v5 described. Any partition threshold is now an offline
+  arithmetic exercise rather than another model run.
+- Two guards went in with it: a unit recorded before the per-class field
+  existed is recomputed rather than skipped, and each adapted pass asserts
+  its label vector matches the frozen pass over the same window, since
+  per-class counts from different orderings would not be alignable.
+
+**Added:**
+
+- `scripts/22_threshold_sweep.py` and `threshold_sweep.json`. Sweeps the
+  partition threshold from 5 to 25 points and relates per-class effect to
+  per-class drift magnitude. Adds no model runs. Refuses to report anything
+  until the 10-point partition reproduces the recorded +6.87 / -2.79 and
+  +7.18 / -4.89 from the counts.
+- `results/RESULTS.md` section 19, declared post-hoc.
+
+**What the sweep found.** All five addendum rules hold. The sign of the
+transfer never changes; the operating point stays above break-even at every
+cut with the margin between 31 and 37 points; the gain on the affected side
+*rises* from +6.87 to +8.22 as the cut tightens, which is the dose-response
+the mechanism predicts; and per-class drift magnitude correlates positively
+with per-class benefit at every support floor (Spearman +0.27 to +0.54,
+moderate rather than tight). **The partition threshold is not load-bearing.**
+
+**What the per-class counts found, and it changes the paper's claim.**
+85 percent of the filtered method's net loss on undrifted traffic falls on
+one class. `instagram`, with 0.2 points of drift, goes from 0.9721 to 0.7548
+accuracy on 52,866 flows, in every window and at every seed. Excluding it,
+the filtered loss on undrifted traffic is 0.46 points while recalibration
+still costs 2.94. The two conditions fail differently: recalibration imposes
+a broad tax, and entropy filtering removes most of the broad tax while
+converting what remains into a tail. The affected side is heterogeneous too:
+10 of its 29 classes are harmed, including the largest, `google-www`, at
+-9.54 points on 97,454 flows.
+
+The manuscript now states the cost as a tail risk rather than a budgetable
+average. That is a stronger operational claim than the aggregate it replaces,
+and it is the one the measurements support.
+
+**Verification:** 231 checks, 0 failures. Sections 14 and 15 of
+`21_verify_all.py` cover every number above, and evaluate addendum rules R1
+and R3 from the data rather than trusting the recorded verdict.
+
+---
+
+## v5 (2026-09-09)
+
+No experiment was run and no measured value changed. Four descriptions that
+were true but misleading if read closely were made precise, and three facts
+derived from released artifacts were added. Recorded in `results/RESULTS.md`
+section 7.8.
+
+**Corrected descriptions:**
+
+- The `head` retraining capacity was described throughout as "BN stats
+  frozen". It retrains the final classification layer with the backbone in
+  evaluation mode and touches no normalization at all, neither the affine
+  parameters nor the running statistics. Consequently `head` versus `matched`
+  is a two-variable contrast, and the single-variable isolation of the
+  statistics is `src-stats` versus frozen.
+- Section 8 item 3 said the post-hoc partition units "bit-reproduce
+  Experiment B". They reproduce the corresponding k=0 units; the section 13
+  entries for the K=3 conditions are means and differ by up to 0.48 points.
+- Section 14.4 gave a break-even prevalence without saying which of three
+  reasonable definitions produced it. It is the mean of the per-window
+  values, and the alternatives differ in the second decimal.
+
+**Added:**
+
+- `scripts/count_params.py` and `params_count.json`. Model total 2,261,653
+  parameters; `matched` updates 6,400 BN affine parameters (0.28 percent),
+  `head` updates 61,302 in the classifier (2.71 percent). Note the inversion:
+  `matched` recovers more overall (+13.00 against +11.19) from one tenth as
+  many parameters, and it is the one that damages the classes that did not
+  drift.
+- Threshold sensitivity of the class partition, from `class_partition.json`.
+- The definition behind the break-even prevalence, with its per-window range.
+
+**Verification:** 189 checks, 0 failures, up from 145. Two claims that had
+rested on hand inspection became machine-checked: the dropout modules behind
+the determinism exception in section 7.6, and the identity of the module
+`find_head` resolves to.
+
+---
+
 ## v4 (2026-09-08)
 
 Five pre-registered experiment families, one post-hoc analysis, and a
