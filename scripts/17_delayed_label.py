@@ -35,6 +35,18 @@ CAPACITIES (all supervised, cross-entropy on ground truth):
             configuration. The only condition here that could become a
             deployment recommendation.
 
+PRE-DRIFT MODE (--predrift), DECLARED POST-HOC:
+  Every source day in --report post-dates the W-2022-45 certificate change,
+  so --report measures what label-free adaptation is worth AFTER the first
+  post-drift labels exist. It says nothing about the interval before them,
+  which is the regime label-free adaptation is actually advocated for.
+  --predrift retrains on days that PRECEDE the drift and evaluates on the
+  same unchanged report windows. It is governed by
+  ADDENDUM_predrift_labels.md, hash-locked before the run, and it writes to
+  its own artifact so that delayed_label_progress.json and every check
+  against it stay untouched. The pre-registered DELTAS are not modified and
+  the B-K1 verdict is not recomputed.
+
 KILL RULE B-K1, pre-registered and checked automatically below:
   If any delayed-label baseline at any delta exceeds the label-free filtered
   recovery by more than 2.0 points, the paper does not present label-free
@@ -65,6 +77,7 @@ BATCH      = 256
 AUDIT_JSON = "streaming_order_audit.json"
 CONFIG_JSON = "delayed_label_config.json"
 CKPT       = "delayed_label_progress.json"
+PRE_CKPT   = "predrift_label_progress.json"     # --predrift only
 
 EVAL_DAY      = "20221121"          # the day holding the three report windows
 DELTAS        = [1, 3, 7]           # pre-registered, all reported
@@ -96,6 +109,17 @@ GRID = {"matched":   {"lr": [1e-4, 1e-3], "steps": [50, 100]},
 SUPERVISED = ("matched", "head", "full")
 LABEL_FREE_DELAYED = ("src-stats", "src-tent")
 TUNE_EVAL_DAY = "20221116"          # inside W-2022-46; source is delta=1
+
+# Pre-drift source days, declared post-hoc (ADDENDUM_predrift_labels.md).
+# 20221107 is the Monday of W-2022-45, before the onset the depth probe
+# locates later in that week, and it is day-of-week matched to the Monday
+# evaluation day. 20221031 is the Monday of W-2022-44, unambiguously
+# pre-drift but also the week the public weights were trained on, so its
+# result is inflated by memorization and is reported with that caveat.
+PREDRIFT_DAYS = [("20221107", "W-2022-45, pre-onset, day-of-week matched"),
+                 ("20221031", "W-2022-44, the model's own training week")]
+PREDRIFT_CAPS = ("src-stats", "src-tent", "head", "matched", "full")
+PREDRIFT_WHY = dict(PREDRIFT_DAYS)
 
 
 # --- input path resolution -------------------------------------------------
@@ -298,6 +322,16 @@ def day_start(day):
         if day in dm and dm[day].get("flows"):
             return int(dm[day]["first_batch_index"])
     return None
+
+
+def load_ck_path(p):
+    if os.path.exists(p):
+        with open(p) as f: return json.load(f)
+    return {"done": {}}
+
+
+def save_ck_path(p, c):
+    with open(p, "w") as f: json.dump(c, f, indent=1)
 
 
 def load_ckpt():
@@ -554,20 +588,180 @@ def do_report(args):
     print(f"\n  All deltas reported (B-K3). Raw: {CKPT}")
 
 
+def do_predrift(args):
+    """Retrain on labels that PRE-DATE the drift and evaluate on the unchanged
+    report windows. Declared post-hoc; writes its own artifact."""
+    if not os.path.isfile(_resolve(CONFIG_JSON)):
+        sys.exit(f"[STOP] {CONFIG_JSON} not found. --predrift reuses the "
+                 f"configuration frozen for --report and does not tune "
+                 f"anything of its own.")
+    with open(_resolve(CONFIG_JSON)) as f:
+        cfg = json.load(f)
+    caps = cfg["per_capacity"]
+
+    days = ([d.strip() for d in args.days.split(",") if d.strip()]
+            or [d for d, _ in PREDRIFT_DAYS])
+    caps_run = ([c.strip() for c in args.caps.split(",") if c.strip()]
+                or list(PREDRIFT_CAPS))
+    for c in caps_run:
+        if c not in PREDRIFT_CAPS:
+            sys.exit(f"[STOP] unknown capacity {c}")
+
+    print("=== PRE-DRIFT LABEL CONDITION (declared post-hoc) ===")
+    print("    governed by ADDENDUM_predrift_labels.md")
+    print(f"    evaluation: the three report windows of {EVAL_DAY}, unchanged")
+    print("    configuration: frozen, reused from --report, NOT retuned")
+    for day in days:
+        print(f"    source {day}: {PREDRIFT_WHY.get(day, 'source-day sweep')}")
+    print(f"    capacities: {', '.join(caps_run)}")
+    if set(days) != {d for d, _ in PREDRIFT_DAYS} or set(caps_run) != set(PREDRIFT_CAPS):
+        print("    [SWEEP MODE] this is a follow-up to the addendum run, not")
+        print("    the addendum run itself. P1 to P3 are still evaluated on")
+        print("    20221107 over supervised capacities only, and are unchanged")
+        print("    by anything added here.")
+    print()
+
+    ckpt = load_ck_path(PRE_CKPT)
+    if ckpt["done"]:
+        print(f"[RESUME] {len(ckpt['done'])} units done\n")
+
+    base, tloader, device = build(args.size, TEST_WEEK)
+    print(f"device={device}")
+    windows = [collect(tloader, a, b - a, label=f"window {i+1}")
+               for i, (a, b) in enumerate(REPORT_WINDOWS)]
+    frozen = eval_windows(base, windows, device)
+    assert_anchor(frozen[0], REF_FROZEN_W[0], tol=0.0,
+                  name="W-47 window 1 frozen (Table I anchor)")
+    print(f"  [ANCHOR OK] frozen windows "
+          f"{' / '.join(f'{v:.4f}' for v in frozen)}\n")
+
+    for day in days:
+        print(f"--- source {day} "
+              f"({PREDRIFT_WHY.get(day, 'source-day sweep')}) ---")
+        _, sloader, _ = build(args.size, f"DAY-{day}", dates=[day])
+        pool = collect(sloader, 0, POOL_BATCHES, label=f"source {day}")
+        print(f"  labeled pool: {len(pool)} batches ({len(pool)*2048:,} flows)")
+        if len(pool) < POOL_BATCHES:
+            print(f"  [note] short pool; the day holds fewer than "
+                  f"{POOL_BATCHES} batches. Reported as measured.")
+        for cap in caps_run:
+            K = 1 if cap == "full" else args.K
+            for k in range(K):
+                key = f"pre{day}_{cap}_{k}"
+                if key in ckpt["done"]:
+                    continue
+                order = list(np.random.default_rng(7000 + k).permutation(len(pool)))
+                t0 = time.time()
+                m = retrain(base, pool, device, cap,
+                            caps[cap]["lr"], caps[cap]["steps"], order)
+                accs = eval_windows(m, windows, device)
+                ckpt["done"][key] = {
+                    "source_day": day, "capacity": cap, "k": k,
+                    "K_declared": K, "pool_batches": len(pool),
+                    "lr": caps[cap]["lr"], "steps": caps[cap]["steps"],
+                    "accuracies": accs,
+                    "recoveries": [(a - f) * 100 for a, f in zip(accs, frozen)]}
+                save_ck_path(PRE_CKPT, ckpt)
+                print(f"    {cap:>9} k={k}: "
+                      + " / ".join(f"{v:+.2f}" for v in
+                                   ckpt["done"][key]["recoveries"])
+                      + f"  ({(time.time()-t0)/60:.1f}m)")
+                del m
+        del pool
+        print()
+
+    print("==== PRE-DRIFT RESULT: recovery over the frozen model, points ====")
+    print(f"  {'source':>10} {'condition':>11}{'w1':>8}{'w2':>8}{'w3':>8}"
+          f"{'mean':>9}{'K':>4}")
+    print("  " + "-" * 60)
+    best = {}
+    all_days = sorted({v["source_day"] for v in ckpt["done"].values()})
+    for day in all_days:
+        for cap in PREDRIFT_CAPS:
+            keys = [k for k, v in ckpt["done"].items()
+                    if v["source_day"] == day and v["capacity"] == cap]
+            if not keys:
+                continue
+            recs = np.array([ckpt["done"][k]["recoveries"] for k in keys])
+            pw = recs.mean(axis=0)
+            best[(day, cap)] = float(pw.mean())
+            print(f"  {day:>10} {cap:>11}{pw[0]:8.2f}{pw[1]:8.2f}{pw[2]:8.2f}"
+                  f"{pw.mean():9.2f}{len(keys):4d}")
+
+    print("\n==== ADDENDUM DECISION RULES ====")
+    print(f"  label-free filtered reference: {BK1_COMPARATOR:+.2f}p")
+    # P1 to P3 are about what LABELS buy. src-stats and src-tent consume the
+    # same day WITHOUT its labels and exist to isolate that; scoring them here
+    # would answer a different question and can fire the rule spuriously.
+    clean = {kk: v for kk, v in best.items()
+             if kk[0] == "20221107" and kk[1] in SUPERVISED}
+    ctrl = {kk: v for kk, v in best.items()
+            if kk[0] == "20221107" and kk[1] in LABEL_FREE_DELAYED}
+    if not clean:
+        print("  no supervised W-2022-45 source results yet; rules not "
+              "evaluated.")
+        return
+    top = max(clean.values())
+    who = [kk for kk, v in clean.items() if v == top][0]
+    print(f"  best SUPERVISED pre-drift capacity on the non-training source: "
+          f"{who[1]} at {top:+.2f}p")
+    if ctrl:
+        cb = max(ctrl, key=ctrl.get)
+        print(f"  label-free control on the same day (no labels): "
+              f"{cb[1]} at {ctrl[cb]:+.2f}p")
+        if ctrl[cb] > BK1_COMPARATOR:
+            print(f"  [UNPLANNED] the label-free control on pre-drift traffic "
+                  f"EXCEEDS the {BK1_COMPARATOR:+.2f}p headline, which no rule "
+                  f"in the addendum anticipated. It is not covered by P1 to "
+                  f"P4, it is not evidence about labels, and it must be "
+                  f"verified on further source days before it is reported as "
+                  f"anything.")
+    if top - BK1_COMPARATOR > BK1_MARGIN:
+        print("  *** P1 FIRES *** pre-drift labels already dominate label-free")
+        print("      adaptation. The remaining operational claim does not hold "
+              "and must be withdrawn.")
+    elif top <= 0:
+        print("  P2 holds: pre-drift retraining does not beat the frozen model.")
+        print("      The window in which label-free adaptation is the best")
+        print("      available option is exactly: after drift onset, before the")
+        print("      first post-drift labels. State that as the paper's scope.")
+    else:
+        print(f"  P3: pre-drift retraining recovers {top:+.2f}p, between zero and")
+        print(f"      the label-free {BK1_COMPARATOR:+.2f}p. Report the value; the")
+        print("      label-free advantage is real but smaller than the framing")
+        print("      implies.")
+    w44 = {kk: v for kk, v in best.items() if kk[0] == "20221031"}
+    if w44:
+        print(f"\n  W-2022-44 source, reported with the memorization caveat: "
+              f"best {max(w44.values()):+.2f}p")
+    print("\n  P4: no pre-registered number is revised. DELTAS unchanged, "
+          "B-K1 not recomputed.")
+    print(f"  Raw: {PRE_CKPT}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--size", default="S")
     ap.add_argument("--tune", action="store_true")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--predrift", action="store_true",
+                    help="post-hoc: retrain on days BEFORE the drift")
+    ap.add_argument("--days", default="",
+                    help="--predrift only: comma-separated source days, for "
+                         "the source-day sweep. Defaults to the two days the "
+                         "addendum names.")
+    ap.add_argument("--caps", default="",
+                    help="--predrift only: comma-separated subset of "
+                         "src-stats,src-tent,head,matched,full")
     ap.add_argument("--K", type=int, default=3,
                     help="orderings for matched and head; full is always K=1")
     ap.add_argument("--smoke", type=int, default=None,
                     help="tiny tuning run; writes no config")
     ap.add_argument("--no-combined", dest="combined", action="store_false")
     args = ap.parse_args()
-    if args.tune == args.report:
-        sys.exit("[STOP] pass exactly one of --tune or --report.")
-    (do_tune if args.tune else do_report)(args)
+    if sum([args.tune, args.report, args.predrift]) != 1:
+        sys.exit("[STOP] pass exactly one of --tune, --report or --predrift.")
+    (do_tune if args.tune else do_report if args.report else do_predrift)(args)
 
 
 if __name__ == "__main__":

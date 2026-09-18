@@ -63,7 +63,7 @@ PART_SHA  = "class_partition.sha256"
 CONFIG_JSON = "delayed_label_config.json"
 C2_CKPT   = "nondrifted_c2_progress.json"
 B_CKPT    = "delayed_label_progress.json"
-CKPT      = "delayed_label_partition_progress.json"
+CKPT      = "delayed_label_partition_progress.json"     # K=1, the released one
 
 ANCHOR_W47_W1 = 0.72239013671875
 # Recorded Experiment B per-window recoveries, for the reconstruction check.
@@ -269,6 +269,13 @@ def main():
     ap.add_argument("--deltas", default="1,3,7")
     a=ap.parse_args()
 
+    # A K>1 run is a different measurement from the released K=1 one. Writing
+    # both into one file would silently change every number checked against
+    # it, so a K>1 run gets its own artifact and says so.
+    global CKPT
+    if a.K != 1:
+        CKPT = f"delayed_label_partition_K{a.K}_progress.json"
+
     print("=" * 72)
     print("POST-HOC ANALYSIS. NOT PRE-REGISTERED.")
     print("Reported in its own subsection, labeled post-hoc. It decomposes")
@@ -276,7 +283,8 @@ def main():
     print("=" * 72 + "\n")
 
     for f in (PART_JSON, PART_SHA, CONFIG_JSON):
-        if not os.path.exists(f): sys.exit(f"[STOP] {f} not found.")
+        if not os.path.isfile(_resolve(f)):
+            sys.exit(f"[STOP] {f} not found (searched {', '.join(_SEARCH)}).")
     rec=open(_resolve(PART_SHA)).read().split()[0].strip().lower()
     act=sha256_file(_resolve(PART_JSON))
     if rec!=act:
@@ -293,6 +301,8 @@ def main():
     print()
 
     ck=json.load(open(CKPT)) if os.path.exists(CKPT) else {"done":{}}
+    print(f"  K={a.K}; artifact {CKPT}"
+          + ("" if a.K == 1 else "  (separate from the released K=1 record)"))
     if ck["done"]: print(f"[RESUME] {len(ck['done'])} units done\n")
 
     base,loader,device=build(a.size,TEST_WEEK)
@@ -383,6 +393,7 @@ def main():
 
     print("==== POST-HOC PARTITION DECOMPOSITION (NOT PRE-REGISTERED) ====")
     print("  change in accuracy on the three W-2022-47 report windows\n")
+    srcs = set()
     print(f"  {'condition':<28}{'affected':>10}{'unaffected':>12}"
           f"{'net':>8}{'recorded':>10}{'check':>7}")
     print("  " + "-"*75)
@@ -402,19 +413,26 @@ def main():
             # recorded Experiment B means are over K=3 for several capacities
             # while this run is K=1, so comparing against those means would
             # flag a K mismatch as a discrepancy.
-            rm = float("nan")
+            rm, rm_src = float("nan"), ""
             if bprog is not None:
                 per = [np.mean(bprog[f"d{delta}_{cap}_{k}"]["recoveries"])
                        for k in range(a.K)
                        if f"d{delta}_{cap}_{k}" in bprog]
-                if per: rm = float(np.mean(per))
+                if per:
+                    rm, rm_src = float(np.mean(per)), f"B, k=0..{len(per)-1}"
             if np.isnan(rm):
                 r = RECORDED_B.get((delta, cap))
-                rm = np.mean(r) if r else float("nan")
-            ok="ok" if r and abs(np.mean(nets)-rm)<0.15 else ("CHECK" if r else "")
+                if r:
+                    rm, rm_src = float(np.mean(r)), "recorded K=3 mean"
+            ok = ("" if np.isnan(rm)
+                  else ("ok" if abs(np.mean(nets) - rm) < 0.15 else "CHECK"))
+            srcs.add(rm_src)
             lf=" [label-free]" if cap in ("src-stats","src-tent") else ""
             print(f"  {cap+', d='+str(delta)+'d':<28}{np.mean(das):10.2f}"
                   f"{np.mean(dus):12.2f}{np.mean(nets):8.2f}{rm:10.2f}{ok:>7}{lf}")
+    srcs.discard("")
+    if srcs:
+        print(f"\n  comparator source: {', '.join(sorted(srcs))}")
     print("\n  'net' is the support-weighted combination of the two partitions.")
     print("  It must reconstruct the Experiment B value for the SAME ordering")
     print("  units; 'CHECK' marks any row where it does not, within 0.15 points.")
