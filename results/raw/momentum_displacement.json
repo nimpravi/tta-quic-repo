@@ -1,0 +1,20 @@
+{
+ "rows": [
+  {
+   "cond": "filtered",
+   "momentum": 0.05,
+   "displacement": 0.03134480917921152,
+   "delta_affected": 7.048921183564012,
+   "delta_unaffected": -0.8396602981280076,
+   "n_units": 9
+  },
+  {
+   "cond": "filtered",
+   "momentum": 0.07,
+   "displacement": 0.033797460323613554,
+   "delta_affected": 6.972457737570694,
+   "delta_unaffected": -2.5726240519601435,
+   "n_units": 9
+  }
+ ]
+}
