@@ -1,0 +1,46 @@
+=== RECALIBRATION CONTROL (declared post-hoc) ===
+    recalibrate on 20221107, evaluate on data that did not drift
+    config lr=1e-03, steps=50, q=0.5, m=0.1. Not retuned.
+    predictions R-A to R-C are in this file's docstring
+
+  built src-stats k=0
+  built src-stats k=1
+  built src-stats k=2
+  built src-tent k=0
+  built src-tent k=1
+  built src-tent k=2
+  20221108 (pre-drift, different day): frozen 0.9548
+      src-stats k=0: 0.9539  (-0.10p)  (7.3m)
+      src-stats k=1: 0.9537  (-0.11p)  (11.5m)
+      src-stats k=2: 0.9535  (-0.14p)  (15.7m)
+      src-tent k=0: 0.9520  (-0.28p)  (20.0m)
+      src-tent k=1: 0.9517  (-0.31p)  (24.2m)
+      src-tent k=2: 0.9520  (-0.28p)  (28.4m)
+C:\Users\Praveen\Downloads\tent-env\Lib\site-packages\cesnet_datazoo\config.py:345: UserWarning: Some test dates (20221031) are before or equal to the last train date (20221106). This might lead to improper evaluation and should be avoided.
+  warnings.warn(f"Some test dates ({min(test_dates).strftime('%Y%m%d')}) are before or equal to the last train date ({max(train_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
+  20221031 (training week): frozen 0.9497
+      src-stats k=0: 0.9479  (-0.18p)  (37.0m)
+      src-stats k=1: 0.9468  (-0.29p)  (41.2m)
+      src-stats k=2: 0.9461  (-0.36p)  (45.5m)
+      src-tent k=0: 0.9472  (-0.26p)  (49.7m)
+      src-tent k=1: 0.9470  (-0.28p)  (53.9m)
+      src-tent k=2: 0.9455  (-0.42p)  (58.1m)
+  [ANCHOR OK] 20221121 frozen = 0.72239013671875
+  20221121 (report week, anchor): frozen 0.7224
+      src-stats k=0: 0.7100  (-1.24p)  (66.8m)
+      src-stats k=1: 0.7048  (-1.76p)  (71.0m)
+      src-stats k=2: 0.7035  (-1.89p)  (75.3m)
+      src-tent k=0: 0.7775  (+5.51p)  (79.5m)
+      src-tent k=1: 0.7794  (+5.70p)  (83.7m)
+      src-tent k=2: 0.7755  (+5.31p)  (88.0m)
+
+==== RESULT: change from recalibrating on a pre-drift day ====
+                  evaluated on   src-stats    src-tent
+  20221108 pre-drift, different day       -0.12       -0.29
+        20221031 training week       -0.28       -0.32
+  20221121 report week, anchor       -1.63       +5.51
+
+==== PRE-COMMITTED PREDICTIONS ====
+  R-C anchor: src-tent on W-2022-47 +5.51p against the recorded +6.01p  [FAILS, STOP]
+      This script does not reproduce script 17. Nothing below
+      is interpretable until that is resolved.

@@ -1,0 +1,38 @@
+=== PER-CLASS EFFECT VERSUS MOMENTUM (declared post-hoc) ===
+    partition verified against class_partition.sha256 (64edb551da13da2a...)
+    condition filtered, lr=1e-03, steps=50, q=0.5
+    momenta [0.05, 0.07, 0.3], K=3, 3 windows
+    predictions C-A to C-C are in this file's docstring
+
+[RESUME] 21 units done
+
+  [ANCHOR OK] window 1 frozen = 0.72239013671875
+    m=0.05  k=0: undrifted mean  -1.06p, worst -11.20p, 2 classes below -10  (8.9m)
+    m=0.05  k=1: undrifted mean  -1.14p, worst -12.00p, 2 classes below -10  (14.2m)
+    m=0.05  k=2: undrifted mean  -1.07p, worst -12.80p, 1 classes below -10  (19.4m)
+    m=0.07  k=0: undrifted mean  -1.50p, worst -24.75p, 3 classes below -10  (24.6m)
+    m=0.07  k=1: undrifted mean  -1.58p, worst -24.38p, 3 classes below -10  (29.9m)
+    m=0.07  k=2: undrifted mean  -1.52p, worst -24.35p, 2 classes below -10  (35.7m)
+    m=0.3   k=0: undrifted mean  -1.60p, worst -24.97p, 4 classes below -10  (43.1m)
+    m=0.3   k=1: undrifted mean  -1.74p, worst -24.78p, 5 classes below -10  (49.2m)
+    m=0.3   k=2: undrifted mean  -1.85p, worst -24.70p, 4 classes below -10  (54.4m)
+    m=0.05  k=0: undrifted mean  -0.78p, worst -10.99p, 1 classes below -10  (62.9m)
+    m=0.05  k=1: undrifted mean  -0.76p, worst  -9.69p, 0 classes below -10  (68.1m)
+    m=0.05  k=2: undrifted mean  -0.91p, worst  -9.34p, 0 classes below -10  (73.3m)
+    m=0.07  k=0: undrifted mean  -1.08p, worst -20.75p, 2 classes below -10  (78.5m)
+    m=0.07  k=1: undrifted mean  -1.03p, worst -20.60p, 2 classes below -10  (83.7m)
+    m=0.07  k=2: undrifted mean  -1.17p, worst -20.71p, 1 classes below -10  (88.9m)
+    m=0.3   k=0: undrifted mean  -1.22p, worst -21.33p, 2 classes below -10  (94.1m)
+    m=0.3   k=1: undrifted mean  -1.22p, worst -21.11p, 1 classes below -10  (99.2m)
+    m=0.3   k=2: undrifted mean  -1.13p, worst -21.23p, 1 classes below -10  (104.4m)
+    m=0.05  k=0: undrifted mean  -0.87p, worst -14.29p, 2 classes below -10  (112.8m)
+    m=0.05  k=1: undrifted mean  -0.86p, worst -19.05p, 1 classes below -10  (118.1m)
+    m=0.05  k=2: undrifted mean  -0.95p, worst -19.05p, 1 classes below -10  (123.3m)
+    m=0.07  k=0: undrifted mean  -1.26p, worst -19.36p, 3 classes below -10  (128.5m)
+    m=0.07  k=1: undrifted mean  -1.21p, worst -19.32p, 2 classes below -10  (133.7m)
+    m=0.07  k=2: undrifted mean  -1.19p, worst -19.62p, 2 classes below -10  (138.8m)
+    m=0.3   k=0: undrifted mean  -1.62p, worst -19.78p, 3 classes below -10  (144.0m)
+    m=0.3   k=1: undrifted mean  -1.47p, worst -19.45p, 3 classes below -10  (149.1m)
+    m=0.3   k=2: undrifted mean  -1.44p, worst -20.04p, 2 classes below -10  (154.3m)
+
+  not enough units yet for the predictions

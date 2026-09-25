@@ -1,0 +1,42 @@
+=== BN MOMENTUM AND DISPLACEMENT (declared post-hoc) ===
+    partition verified against class_partition.sha256 (64edb551da13da2a...)
+    affected 29, unaffected 73
+    frozen config lr=1e-03, steps=50, q=0.5, momentum swept
+    grid: [0.05, 0.07] x ['filtered'] x K=3 x 3 windows
+    predictions M-A to M-E are recorded in this file's docstring
+
+[RESUME] 111 units done
+
+  [ANCHOR OK] window 1 frozen = 0.72239013671875
+  [PREFLIGHT] checking that BN momentum 0.0 freezes running stats
+      OK: statistics bit-identical, predictions identical, displacement 0.0e+00
+  window 1 frozen: affected 0.5905, unaffected 0.9457
+     filtered m=0.05  k=0: dA  +7.39p  dU  -0.76p  disp 0.03253  (10.7m)
+     filtered m=0.05  k=1: dA  +7.36p  dU  -0.85p  disp 0.03263  (16.0m)
+     filtered m=0.05  k=2: dA  +7.44p  dU  -0.48p  disp 0.03178  (21.4m)
+     filtered m=0.07  k=0: dA  +7.31p  dU  -2.76p  disp 0.03513  (26.8m)
+     filtered m=0.07  k=1: dA  +7.34p  dU  -2.78p  disp 0.03521  (32.1m)
+     filtered m=0.07  k=2: dA  +7.32p  dU  -2.82p  disp 0.03430  (37.3m)
+  window 2 frozen: affected 0.5901, unaffected 0.9369
+     filtered m=0.05  k=0: dA  +6.55p  dU  -0.98p  disp 0.03053  (45.8m)
+     filtered m=0.05  k=1: dA  +6.60p  dU  -0.59p  disp 0.03057  (51.1m)
+     filtered m=0.05  k=2: dA  +6.64p  dU  -0.85p  disp 0.03201  (56.5m)
+     filtered m=0.07  k=0: dA  +6.47p  dU  -2.35p  disp 0.03300  (61.9m)
+     filtered m=0.07  k=1: dA  +6.48p  dU  -2.32p  disp 0.03301  (67.2m)
+     filtered m=0.07  k=2: dA  +6.54p  dU  -2.39p  disp 0.03451  (72.6m)
+  window 3 frozen: affected 0.5898, unaffected 0.9431
+     filtered m=0.05  k=0: dA  +7.27p  dU  -1.35p  disp 0.03057  (81.2m)
+     filtered m=0.05  k=1: dA  +7.15p  dU  -0.78p  disp 0.03117  (86.5m)
+     filtered m=0.05  k=2: dA  +7.04p  dU  -0.91p  disp 0.03032  (91.8m)
+     filtered m=0.07  k=0: dA  +7.27p  dU  -2.59p  disp 0.03285  (97.2m)
+     filtered m=0.07  k=1: dA  +7.08p  dU  -2.57p  disp 0.03352  (102.5m)
+     filtered m=0.07  k=2: dA  +6.95p  dU  -2.58p  disp 0.03265  (107.7m)
+
+==== E5: PARTITION EFFECT VERSUS BN MOMENTUM ====
+       cond      m      disp        dA        dU   dA/|dU|
+   filtered   0.05   0.03134     +7.05     -0.84      8.39
+   filtered   0.07   0.03380     +6.97     -2.57      2.71
+
+==== PRE-COMMITTED PREDICTIONS ====
+
+  raw: momentum_displacement_progress.json   summary: momentum_displacement.json

@@ -1,0 +1,41 @@
+==== WORST UNDRIFTED CLASS, PER WINDOW ====
+   win      m        class   support    delta  #<-10  flows in those
+     0    0.1     class_66    16,451   -24.82      4          17,516
+     0   0.03     class_72       310    -9.89      0               0
+     1    0.1     class_66    16,191   -21.11      2          16,373
+     1   0.03     class_72       423    -9.69      0               0
+     2    0.1     class_66    20,224   -19.73      3          21,116
+     2   0.03     class_34        21   -15.87      1              21
+  Read this table, not the pooled one, for any worst-case claim.
+  Check the support column: a large loss on a few hundred flows is
+  a handful of flows changing label, not a service failing.
+
+==== PER-CLASS CHANGE ON THE UNDRIFTED PARTITION ====
+  Averaged over windows and seeds. A class that collapses in one
+  window only is diluted here; the per-window table above is the
+  one to quote.
+  class                          support     m=0.1    m=0.03
+  class_66                        20,224    -21.88     -1.03
+  class_94                           182     -9.43     -6.06
+  class_99                           845     -8.96     -2.88
+  class_34                            61     -8.72     -7.29
+  class_72                           423     -7.92     -7.90
+  class_78                         1,082     -7.36     -4.18
+  class_11                         1,221     -4.64     -6.04
+  class_76                         1,557     -4.30     -4.73
+  class_73                           360     -3.72     -2.85
+  class_70                           477     -3.72     -7.05
+  class_64                           376     -3.39     -4.16
+  class_35                           176     -2.97     -2.27
+
+==== PRE-COMMITTED PREDICTIONS ====
+  worst undrifted class at m=0.1: class_66 (20,224 flows)
+    m=0.1  -21.88 points
+    m=0.03 -1.03 points
+  C-A worst undrifted class still loses more than 10 points at m=0.03  [FAILS]
+      The per-class catastrophe is itself a momentum artifact.
+      The finding becomes that the shipped default is wrong.
+      That is a different paper: title, abstract and framing
+      all change. Report it, do not rescue it.
+  C-B undrifted classes losing more than 10 points: 1 at m=0.1, 0 at m=0.03  [FAILS]
+  C-C Spearman between the two momenta over 73 undrifted classes: +0.904  [HOLDS]

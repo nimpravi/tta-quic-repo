@@ -1,0 +1,68 @@
+=== PRE-DRIFT LABEL CONDITION (declared post-hoc) ===
+    governed by ADDENDUM_predrift_labels.md
+    evaluation: the three report windows of 20221121, unchanged
+    configuration: frozen, reused from --report, NOT retuned
+    source 20221107: W-2022-45, pre-onset, day-of-week matched
+    source 20221031: W-2022-44, the model's own training week
+
+device=cpu
+  [ANCHOR OK] frozen windows 0.7224 / 0.7243 / 0.7395
+
+--- source 20221107 (W-2022-45, pre-onset, day-of-week matched) ---
+  labeled pool: 200 batches (409,600 flows)
+    src-stats k=0: -1.57 / -1.92 / -1.85  (10.7m)
+    src-stats k=1: -1.19 / -1.54 / -1.41  (10.8m)
+    src-stats k=2: -0.01 / -0.26 / -0.16  (10.8m)
+     src-tent k=0: +6.18 / +6.36 / +6.02  (12.2m)
+     src-tent k=1: +5.74 / +6.00 / +5.67  (12.3m)
+     src-tent k=2: +6.01 / +6.17 / +5.91  (12.1m)
+         head k=0: +0.30 / +0.38 / +0.19  (11.6m)
+         head k=1: -0.42 / -0.46 / -0.56  (11.6m)
+         head k=2: -0.24 / -0.26 / -0.39  (11.6m)
+      matched k=0: +2.11 / +2.50 / +2.25  (14.1m)
+      matched k=1: +0.48 / +0.29 / +0.26  (14.1m)
+      matched k=2: +0.35 / +0.24 / +0.15  (14.0m)
+         full k=0: +2.69 / +3.16 / +2.78  (16.3m)
+
+--- source 20221031 (W-2022-44, the model's own training week) ---
+C:\Users\Praveen\Downloads\tent-env\Lib\site-packages\cesnet_datazoo\config.py:345: UserWarning: Some test dates (20221031) are before or equal to the last train date (20221106). This might lead to improper evaluation and should be avoided.
+  warnings.warn(f"Some test dates ({min(test_dates).strftime('%Y%m%d')}) are before or equal to the last train date ({max(train_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
+  labeled pool: 200 batches (409,600 flows)
+    src-stats k=0: -0.84 / +0.05 / +0.38  (10.6m)
+    src-stats k=1: -1.22 / -0.43 / -0.04  (10.6m)
+    src-stats k=2: -1.29 / -0.50 / -0.09  (11.1m)
+     src-tent k=0: +0.94 / +1.52 / +1.66  (15.8m)
+     src-tent k=1: +0.23 / +0.46 / +0.68  (15.2m)
+     src-tent k=2: +0.42 / +0.83 / +1.03  (15.0m)
+         head k=0: +0.15 / +0.43 / +0.24  (14.3m)
+         head k=1: +0.21 / +0.42 / +0.28  (14.3m)
+         head k=2: +0.23 / +0.45 / +0.38  (14.3m)
+      matched k=0: -3.20 / -3.14 / -2.82  (17.7m)
+      matched k=1: -2.95 / -2.95 / -2.51  (17.6m)
+      matched k=2: -2.27 / -2.14 / -1.78  (17.7m)
+         full k=0: -2.87 / -2.83 / -2.37  (20.7m)
+
+==== PRE-DRIFT RESULT: recovery over the frozen model, points ====
+      source   condition      w1      w2      w3     mean   K
+  ------------------------------------------------------------
+    20221107   src-stats   -0.92   -1.24   -1.14    -1.10   3
+    20221107    src-tent    5.98    6.17    5.87     6.01   3
+    20221107        head   -0.12   -0.11   -0.25    -0.16   3
+    20221107     matched    0.98    1.01    0.89     0.96   3
+    20221107        full    2.69    3.16    2.78     2.88   1
+    20221031   src-stats   -1.12   -0.29    0.09    -0.44   3
+    20221031    src-tent    0.53    0.93    1.12     0.86   3
+    20221031        head    0.20    0.43    0.30     0.31   3
+    20221031     matched   -2.81   -2.74   -2.37    -2.64   3
+    20221031        full   -2.87   -2.83   -2.37    -2.69   1
+
+==== ADDENDUM DECISION RULES ====
+  label-free filtered reference: +3.06p
+  best pre-drift capacity on the non-training source: src-tent at +6.01p
+  *** P1 FIRES *** pre-drift labels already dominate label-free
+      adaptation. The remaining operational claim does not hold and must be withdrawn.
+
+  W-2022-44 source, reported with the memorization caveat: best +0.86p
+
+  P4: no pre-registered number is revised. DELTAS unchanged, B-K1 not recomputed.
+  Raw: predrift_label_progress.json

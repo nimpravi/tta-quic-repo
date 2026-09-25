@@ -1,0 +1,74 @@
+==== WORST UNDRIFTED CLASS, PER WINDOW ====
+   win      m        class   support    delta  #<-10  flows in those
+     0   0.03     class_72       310    -9.89      0               0
+     0   0.05     class_94       125   -12.00      2             435
+     0  0.055     class_66    16,451   -14.05      3          16,886
+     0   0.06     class_66    16,451   -22.04      3          16,886
+     0  0.065     class_66    16,451   -24.26      3          16,886
+     0   0.07     class_66    16,451   -24.49      3          16,886
+     0    0.1     class_66    16,451   -24.82      4          17,516
+     0    0.3     class_66    16,451   -24.82      4          17,516
+     1   0.03     class_72       423    -9.69      0               0
+     1   0.05     class_94       182    -9.71      0               0
+     1  0.055     class_66    16,191   -12.57      2          16,373
+     1   0.06     class_66    16,191   -18.43      2          16,373
+     1  0.065     class_66    16,191   -20.45      2          16,373
+     1   0.07     class_66    16,191   -20.69      2          16,373
+     1    0.1     class_66    16,191   -21.11      2          16,373
+     1    0.3     class_66    16,191   -21.22      2          16,373
+     2   0.03     class_34        21   -15.87      1              21
+     2   0.05     class_34        21   -17.46      1              21
+     2  0.055     class_34        21   -17.46      2          20,245
+     2   0.06     class_66    20,224   -18.68      2          20,245
+     2  0.065     class_66    20,224   -19.34      2          20,245
+     2   0.07     class_66    20,224   -19.43      2          20,245
+     2    0.1     class_66    20,224   -19.73      3          21,116
+     2    0.3     class_66    20,224   -19.76      3          21,116
+  Read this table, not the pooled one, for any worst-case claim.
+  Check the support column: a large loss on a few hundred flows is
+  a handful of flows changing label, not a service failing.
+
+==== MOMENTUM CURVE FOR class_66 ====
+        m    delta  % of deepest   flows<-10
+     0.03    -1.03          4.7%          21
+     0.05    -6.63         30.2%         456
+    0.055   -13.47         61.4%      53,504
+     0.06   -19.71         89.9%      53,504
+    0.065   -21.35         97.3%      53,504
+     0.07   -21.54         98.2%      53,504
+      0.1   -21.88         99.8%      55,005
+      0.3   -21.93        100.0%      55,005
+  A percentage that jumps between two adjacent momenta is a
+  threshold, not a slope, and the paper should say which it is.
+
+==== PER-CLASS CHANGE ON THE UNDRIFTED PARTITION ====
+  Averaged over windows and seeds. A class that collapses in one
+  window only is diluted here; the per-window table above is the
+  one to quote.
+  class                          support     m=0.1    m=0.03
+  class_66                        20,224    -21.88     -1.03
+  class_94                           182     -9.43     -6.06
+  class_99                           845     -8.96     -2.88
+  class_34                            61     -8.72     -7.29
+  class_72                           423     -7.92     -7.90
+  class_78                         1,082     -7.36     -4.18
+  class_11                         1,221     -4.64     -6.04
+  class_76                         1,557     -4.30     -4.73
+  class_73                           360     -3.72     -2.85
+  class_70                           477     -3.72     -7.05
+  class_64                           376     -3.39     -4.16
+  class_35                           176     -2.97     -2.27
+
+==== PRE-COMMITTED PREDICTIONS ====
+  worst undrifted class at m=0.1: class_66 (20,224 flows)
+    m=0.1  -21.88 points
+    m=0.03 -1.03 points
+  C-A worst undrifted class still loses more than 10 points at m=0.03  [FAILS]
+      The per-class catastrophe is itself a momentum artifact.
+      The finding becomes that the shipped default is wrong.
+      That is a different paper: title, abstract and framing
+      all change. Report it, do not rescue it.
+  C-B undrifted classes losing more than 10 points: 1 at m=0.1, 0 at m=0.03  [FAILS]
+  C-C Spearman between the two momenta over 73 undrifted classes: +0.904  [HOLDS]
+
+  raw: perclass_momentum_progress.json   summary: perclass_momentum.json

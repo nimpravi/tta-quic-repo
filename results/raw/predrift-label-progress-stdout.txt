@@ -1,0 +1,93 @@
+=== PRE-DRIFT LABEL CONDITION (declared post-hoc) ===
+    governed by ADDENDUM_predrift_labels.md
+    evaluation: the three report windows of 20221121, unchanged
+    configuration: frozen, reused from --report, NOT retuned
+    source 20221108: source-day sweep
+    source 20221109: source-day sweep
+    source 20221110: source-day sweep
+    source 20221111: source-day sweep
+    source 20221112: source-day sweep
+    source 20221113: source-day sweep
+    capacities: src-tent, src-stats
+    [SWEEP MODE] this is a follow-up to the addendum run, not
+    the addendum run itself. P1 to P3 are still evaluated on
+    20221107 over supervised capacities only, and are unchanged
+    by anything added here.
+
+[RESUME] 26 units done
+
+device=cpu
+  [ANCHOR OK] frozen windows 0.7224 / 0.7243 / 0.7395
+
+--- source 20221108 (source-day sweep) ---
+  labeled pool: 200 batches (409,600 flows)
+     src-tent k=0: +6.08 / +6.32 / +5.94  (11.6m)
+    src-stats k=0: +0.49 / +0.44 / +0.34  (10.3m)
+
+--- source 20221109 (source-day sweep) ---
+  labeled pool: 200 batches (409,600 flows)
+     src-tent k=0: +5.38 / +5.46 / +5.03  (11.5m)
+    src-stats k=0: +0.94 / +0.52 / +1.27  (10.3m)
+
+--- source 20221110 (source-day sweep) ---
+  labeled pool: 200 batches (409,600 flows)
+     src-tent k=0: +4.89 / +4.74 / +4.49  (11.5m)
+    src-stats k=0: +0.96 / +0.55 / +1.31  (10.3m)
+
+--- source 20221111 (source-day sweep) ---
+  labeled pool: 200 batches (409,600 flows)
+     src-tent k=0: +3.70 / +3.06 / +3.14  (11.5m)
+    src-stats k=0: +3.14 / +2.56 / +3.15  (10.4m)
+
+--- source 20221112 (source-day sweep) ---
+  [WARN] source 20221112 wanted 200 from offset 0, got 173
+  labeled pool: 173 batches (354,304 flows)
+  [note] short pool; the day holds fewer than 200 batches. Reported as measured.
+     src-tent k=0: +3.00 / +2.79 / +2.75  (11.4m)
+    src-stats k=0: +2.04 / +1.98 / +2.41  (10.4m)
+
+--- source 20221113 (source-day sweep) ---
+  labeled pool: 200 batches (409,600 flows)
+     src-tent k=0: +2.91 / +2.58 / +2.57  (11.4m)
+    src-stats k=0: +2.02 / +1.93 / +2.34  (10.3m)
+
+==== PRE-DRIFT RESULT: recovery over the frozen model, points ====
+      source   condition      w1      w2      w3     mean   K
+  ------------------------------------------------------------
+    20221031   src-stats   -1.12   -0.29    0.09    -0.44   3
+    20221031    src-tent    0.53    0.93    1.12     0.86   3
+    20221031        head    0.20    0.43    0.30     0.31   3
+    20221031     matched   -2.81   -2.74   -2.37    -2.64   3
+    20221031        full   -2.87   -2.83   -2.37    -2.69   1
+    20221107   src-stats   -0.92   -1.24   -1.14    -1.10   3
+    20221107    src-tent    5.98    6.17    5.87     6.01   3
+    20221107        head   -0.12   -0.11   -0.25    -0.16   3
+    20221107     matched    0.98    1.01    0.89     0.96   3
+    20221107        full    2.69    3.16    2.78     2.88   1
+    20221108   src-stats    0.49    0.44    0.34     0.43   1
+    20221108    src-tent    6.08    6.32    5.94     6.11   1
+    20221109   src-stats    0.94    0.52    1.27     0.91   1
+    20221109    src-tent    5.38    5.46    5.03     5.29   1
+    20221110   src-stats    0.96    0.55    1.31     0.94   1
+    20221110    src-tent    4.89    4.74    4.49     4.71   1
+    20221111   src-stats    3.14    2.56    3.15     2.95   1
+    20221111    src-tent    3.70    3.06    3.14     3.30   1
+    20221112   src-stats    2.04    1.98    2.41     2.14   1
+    20221112    src-tent    3.00    2.79    2.75     2.85   1
+    20221113   src-stats    2.02    1.93    2.34     2.10   1
+    20221113    src-tent    2.91    2.58    2.57     2.68   1
+
+==== ADDENDUM DECISION RULES ====
+  label-free filtered reference: +3.06p
+  best SUPERVISED pre-drift capacity on the non-training source: full at +2.88p
+  label-free control on the same day (no labels): src-tent at +6.01p
+  [UNPLANNED] the label-free control on pre-drift traffic EXCEEDS the +3.06p headline, which no rule in the addendum anticipated. It is not covered by P1 to P4, it is not evidence about labels, and it must be verified on further source days before it is reported as anything.
+  P3: pre-drift retraining recovers +2.88p, between zero and
+      the label-free +3.06p. Report the value; the
+      label-free advantage is real but smaller than the framing
+      implies.
+
+  W-2022-44 source, reported with the memorization caveat: best +0.86p
+
+  P4: no pre-registered number is revised. DELTAS unchanged, B-K1 not recomputed.
+  Raw: predrift_label_progress.json

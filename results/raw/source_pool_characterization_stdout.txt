@@ -1,0 +1,49 @@
+=== SOURCE POOL CHARACTERIZATION (declared post-hoc) ===
+    no adaptation, no training, one forward pass per day
+    pool = first 200 batches of each day, filter q=0.5
+    PURITY uses labels and is a diagnostic, not an operator signal
+
+C:\Users\Praveen\Downloads\tent-env\Lib\site-packages\cesnet_datazoo\config.py:345: UserWarning: Some test dates (20221031) are before or equal to the last train date (20221106). This might lead to improper evaluation and should be avoided.
+  warnings.warn(f"Some test dates ({min(test_dates).strftime('%Y%m%d')}) are before or equal to the last train date ({max(train_dates).strftime('%Y%m%d')}). This might lead to improper evaluation and should be avoided.")
+  20221031: acc 0.9497  entropy mean 0.1463  kept purity 1.0000  kept entropy 0.0003  (3.6m)
+  20221107: acc 0.9559  entropy mean 0.1305  kept purity 1.0000  kept entropy 0.0001  (7.0m)
+  20221108: acc 0.9548  entropy mean 0.1316  kept purity 1.0000  kept entropy 0.0001  (10.4m)
+  20221109: acc 0.9015  entropy mean 0.1955  kept purity 0.9937  kept entropy 0.0003  (13.9m)
+  20221110: acc 0.8989  entropy mean 0.1967  kept purity 0.9937  kept entropy 0.0003  (17.4m)
+  20221111: acc 0.7731  entropy mean 0.3277  kept purity 0.9319  kept entropy 0.0037  (20.8m)
+  [note] 20221112: 173 batches, short of 200
+  20221112: acc 0.7590  entropy mean 0.3534  kept purity 0.9191  kept entropy 0.0062  (23.8m)
+  20221113: acc 0.7522  entropy mean 0.3537  kept purity 0.9131  kept entropy 0.0064  (27.3m)
+  20221114: acc 0.7233  entropy mean 0.3736  kept purity 0.8718  kept entropy 0.0093  (30.7m)
+  20221118: acc 0.7313  entropy mean 0.3792  kept purity 0.8773  kept entropy 0.0096  (34.2m)
+  [note] 20221120: 198 batches, short of 200
+  20221120: acc 0.7495  entropy mean 0.3527  kept purity 0.9096  kept entropy 0.0063  (37.6m)
+
+==== SOURCE POOL PROPERTIES vs THE GRADIENT TERM ====
+         day     acc   H mean   H kept   purity  gradient
+    20221031  0.9497   0.1463   0.0003   1.0000      1.30
+    20221107  0.9559   0.1305   0.0001   1.0000      7.11
+    20221108  0.9548   0.1316   0.0001   1.0000      5.98
+    20221109  0.9015   0.1955   0.0003   0.9937      4.38
+    20221110  0.8989   0.1967   0.0003   0.9937      3.77
+    20221111  0.7731   0.3277   0.0037   0.9319      0.38
+    20221112  0.7590   0.3534   0.0062   0.9191      0.71
+    20221113  0.7522   0.3537   0.0064   0.9131      0.59
+    20221114  0.7233   0.3736   0.0093   0.8718      0.50
+    20221118  0.7313   0.3792   0.0096   0.8773      0.18
+    20221120  0.7495   0.3527   0.0063   0.9096      0.63
+
+  Spearman against the gradient term:
+    kept purity (P-D)            +0.791
+    kept entropy, headroom       -0.873
+    pool entropy mean            -0.873
+    frozen accuracy              +0.855
+
+  P-A check, the W-2022-44 point:
+    purity 1.0000 vs others [0.8718, 1.0000]
+    kept entropy 0.0003 vs others [0.0001, 0.0096]
+    gradient +1.30
+    P-A expects high purity AND low kept entropy here, with a
+    small gradient term: high purity but nothing left to minimize.
+
+  raw: source_pool_characterization.json

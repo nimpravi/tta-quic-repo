@@ -1,0 +1,54 @@
+=== PER-CLASS EFFECT VERSUS MOMENTUM (declared post-hoc) ===
+    partition verified against class_partition.sha256 (64edb551da13da2a...)
+    condition filtered, lr=1e-03, steps=50, q=0.5
+    momenta [0.1, 0.03], K=3, 3 windows
+    predictions C-A to C-C are in this file's docstring
+
+  [ANCHOR OK] window 1 frozen = 0.72239013671875
+    m=0.1   k=0: undrifted mean  -1.61p, worst -25.03p, 4 classes below -10  (11.4m)
+    m=0.1   k=1: undrifted mean  -1.73p, worst -24.71p, 4 classes below -10  (18.4m)
+    m=0.1   k=2: undrifted mean  -1.66p, worst -24.71p, 4 classes below -10  (25.4m)
+    m=0.03  k=0: undrifted mean  -0.87p, worst -10.00p, 1 classes below -10  (32.3m)
+    m=0.03  k=1: undrifted mean  -0.71p, worst  -9.68p, 0 classes below -10  (39.2m)
+    m=0.03  k=2: undrifted mean  -0.85p, worst -11.20p, 2 classes below -10  (46.0m)
+    m=0.1   k=0: undrifted mean  -1.18p, worst -21.12p, 2 classes below -10  (57.6m)
+    m=0.1   k=1: undrifted mean  -1.12p, worst -21.06p, 2 classes below -10  (67.1m)
+    m=0.1   k=2: undrifted mean  -1.19p, worst -21.14p, 1 classes below -10  (620.4m)
+    m=0.03  k=0: undrifted mean  -0.76p, worst  -9.46p, 0 classes below -10  (625.8m)
+    m=0.03  k=1: undrifted mean  -0.87p, worst -10.69p, 1 classes below -10  (631.0m)
+    m=0.03  k=2: undrifted mean  -0.99p, worst -11.21p, 1 classes below -10  (636.1m)
+    m=0.1   k=0: undrifted mean  -1.42p, worst -19.63p, 3 classes below -10  (644.3m)
+    m=0.1   k=1: undrifted mean  -1.37p, worst -19.63p, 3 classes below -10  (649.4m)
+    m=0.1   k=2: undrifted mean  -1.36p, worst -19.94p, 2 classes below -10  (654.6m)
+    m=0.03  k=0: undrifted mean  -0.54p, worst -14.29p, 1 classes below -10  (659.7m)
+    m=0.03  k=1: undrifted mean  -0.63p, worst -14.29p, 1 classes below -10  (664.8m)
+    m=0.03  k=2: undrifted mean  -0.85p, worst -19.05p, 1 classes below -10  (669.9m)
+E:\docs\EB1A\Paper publication\TTA\tta-quic-repo\github\tta-quic-repo\scripts\27_perclass_momentum.py:250: RuntimeWarning: Mean of empty slice
+  delta[m] = np.nanmean(np.vstack(acc), axis=0) * 100
+
+==== PER-CLASS CHANGE ON THE UNDRIFTED PARTITION ====
+  class                          support     m=0.1    m=0.03
+  class_66                        20,224    -21.88     -1.03
+  class_94                           182     -9.43     -6.06
+  class_99                           845     -8.96     -2.88
+  class_34                            61     -8.72     -7.29
+  class_72                           423     -7.92     -7.90
+  class_78                         1,082     -7.36     -4.18
+  class_11                         1,221     -4.64     -6.04
+  class_76                         1,557     -4.30     -4.73
+  class_73                           360     -3.72     -2.85
+  class_70                           477     -3.72     -7.05
+  class_64                           376     -3.39     -4.16
+  class_35                           176     -2.97     -2.27
+
+==== PRE-COMMITTED PREDICTIONS ====
+  worst undrifted class at m=0.1: class_66 (20,224 flows)
+    m=0.1  -21.88 points
+    m=0.03 -1.03 points
+  C-A worst undrifted class still loses more than 10 points at m=0.03  [FAILS]
+      The per-class catastrophe is itself a momentum artifact.
+      The finding becomes that the shipped default is wrong.
+      That is a different paper: title, abstract and framing
+      all change. Report it, do not rescue it.
+  C-B undrifted classes losing more than 10 points: 1 at m=0.1, 0 at m=0.03  [FAILS]
+  C-C Spearman between the two momenta over 73 undrifted classes: +0.904  [HOLDS]

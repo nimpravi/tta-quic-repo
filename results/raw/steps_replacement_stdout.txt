@@ -1,0 +1,42 @@
+=== STEPS VERSUS MOMENTUM AT MATCHED REPLACEMENT (post-hoc) ===
+    partition verified (64edb551da13da2a...)
+    condition filtered, lr=1e-03, q=0.5
+    new cell m=0.07, S=35, rho=0.921
+    new cell m=0.05, S=70, rho=0.972
+    predictions S-A to S-C are in this file's docstring
+
+  [ANCHOR OK] window 1 frozen = 0.72239013671875
+    m=0.07 S=35 k=0: service   -6.62p  (7.5m)
+    m=0.07 S=35 k=1: service   -6.30p  (12.0m)
+    m=0.07 S=35 k=2: service   -3.89p  (16.5m)
+    m=0.05 S=70 k=0: service  -24.70p  (22.4m)
+    m=0.05 S=70 k=1: service  -24.59p  (28.4m)
+    m=0.05 S=70 k=2: service  -24.53p  (34.4m)
+    m=0.07 S=35 k=0: service   -7.58p  (42.2m)
+    m=0.07 S=35 k=1: service   -3.13p  (46.7m)
+    m=0.07 S=35 k=2: service   -4.50p  (51.3m)
+    m=0.05 S=70 k=0: service  -20.85p  (57.3m)
+    m=0.05 S=70 k=1: service  -20.85p  (63.3m)
+    m=0.05 S=70 k=2: service  -21.01p  (69.3m)
+    m=0.07 S=35 k=0: service   -7.46p  (77.1m)
+    m=0.07 S=35 k=1: service   -5.49p  (81.7m)
+    m=0.07 S=35 k=2: service   -4.21p  (86.3m)
+    m=0.05 S=70 k=0: service  -19.45p  (92.3m)
+    m=0.05 S=70 k=1: service  -19.38p  (98.3m)
+    m=0.05 S=70 k=2: service  -19.63p  (104.3m)
+
+==== SERVICE RECALL AGAINST (m, S) AT MATCHED REPLACEMENT ====
+       m    S     rho   service       dU  flows<-10  source
+    0.07   35   0.921     -5.46    -0.70        825  this run
+    0.05   50   0.923     -6.63                      script 27
+    0.05   70   0.972    -21.67    -2.57     53,844  this run
+    0.07   50   0.973    -21.54                      script 27
+
+==== PRE-COMMITTED PREDICTIONS ====
+  (0.05, 70), rho 0.972: service -21.67p
+  (0.07, 35), rho 0.921: service -5.46p
+  S-A HOLDS. Total statistic replacement controls the collapse,
+  not momentum. Rewrite the headline in terms of rho, change the
+  operator recommendation to bounding rho, and retitle.
+
+  raw: steps_replacement_progress.json   summary: steps_replacement.json
