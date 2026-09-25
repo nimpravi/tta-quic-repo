@@ -1,0 +1,24 @@
+{
+ "device": "cpu",
+ "torch": "2.12.1+cpu",
+ "platform": "Windows-11-10.0.26100-SP0",
+ "flows_per_batch": 2048,
+ "repeats": 30,
+ "adapted_params": 6400,
+ "frozen_forward_s": {
+  "median": 1.199660850004875,
+  "p10": 1.0816996599867708,
+  "p90": 1.301048649995937
+ },
+ "adapt_step_s": {
+  "median": 3.7993238999915775,
+  "p10": 3.256532360005076,
+  "p90": 5.072395729998243
+ },
+ "latency_ratio": 3.166998322881119,
+ "peak_mem_frozen_MiB": 1.763692855834961,
+ "peak_mem_adapted_MiB": 57.039533615112305,
+ "mem_ratio": 32.34096766134989,
+ "flows_per_s_frozen": 1707.1491496881617,
+ "flows_per_s_adapt": 539.0432755692507
+}
