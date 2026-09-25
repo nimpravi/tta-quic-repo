@@ -1,9 +1,9 @@
 # Addendum: the pre-drift label condition (post-hoc, declared)
 
 Status: **draft, to be hash-locked before the run.** Not part of
-`PREREGISTRATION_streaming_delayed_label.md`. Prompted by a second-round
-review observing that every label source in Experiment B post-dates the
-drift. Declared post-hoc wherever it is reported.
+`PREREGISTRATION_streaming_delayed_label.md`. Prompted by the observation
+that every label source in Experiment B post-dates the drift.Declared
+post-hoc wherever it is reported.
 
 ---
 
@@ -39,9 +39,8 @@ Capacities: `src-stats`, `src-tent`, `head`, `matched`, `full`. K=3 except
 step counts frozen for `--report` are applied unchanged. Retuning per source
 day is a selection freedom the pre-registration does not grant, and the
 conservative reading is that a configuration tuned to help a post-drift
-source is not being handicapped here. If a reviewer contests the point, a
-tuning sweep on the pre-drift source is available as a follow-up and would be
-declared separately.
+source is not being handicapped here. A tuning sweep on the pre-drift source remains
+available as a follow-up and would be declared separately.
 
 **Isolation.** The run writes `predrift_label_progress.json`, a new artifact.
 `delayed_label_progress.json` is not touched, `DELTAS` is not modified, and

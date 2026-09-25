@@ -4,6 +4,84 @@ A summary of what changed between versions of the experimental record, and
 why. This file is a summary: the full mechanism of every correction, with the
 evidence for it, is in [`results/RESULTS.md`](results/RESULTS.md) section 7.
 
+---
+
+## v7 (2026-09-25)
+
+The families behind the current manuscript. No pre-registered result is
+revised, and no value recorded in v4, v5 or v6 changes. The sweeps in this
+version are exploratory: the pre-registration fixed the BN momentum at 0.1
+and the step count at 50, and these runs vary both.
+
+**Added, scripts and artifacts:**
+
+- `scripts/23_source_pool_characterization.py`,
+  `source_pool_characterization.json`. Per-day frozen accuracy, mean
+  predictive entropy and kept-set purity on eleven days. This locates the
+  drift onset inside W-2022-45 from data rather than from the certificate
+  record: 0.955 on 8 November, 0.902 and 0.899 on 9 and 10 November, 0.773 on
+  11 November.
+- `scripts/24_momentum_displacement.py`,
+  `momentum_displacement_progress.json`. Momentum grid for both conditions,
+  with the displacement of the BN running statistics recorded per unit.
+- `scripts/25_prevalence_sweep.py`, `prevalence_sweep_progress.json`,
+  `prevalence_sweep.json`. Resamples each window to a target drift prevalence
+  and re-adapts, giving a measured break-even rather than a substituted one.
+- `scripts/26_inference_cost.py`, `inference_cost.json`. Latency and
+  throughput over 30 repeats. The peak-memory fields in this artifact are not
+  measurements: CPU `tracemalloc` does not see torch's allocator. They are
+  released and explicitly excluded from verification.
+- `scripts/27_perclass_momentum.py`, `perclass_momentum_progress.json`,
+  `perclass_momentum.json`. Per-class recall against momentum for the
+  filtered condition.
+- `scripts/29_recalibration_control.py`, `recalibration_control.json`.
+  Recalibrates on a pre-drift day and evaluates off the report week.
+- `scripts/30_steps_replacement.py`, `steps_replacement_progress.json`,
+  `steps_replacement.json`. Two configurations that hold the replaced
+  fraction fixed while trading momentum against step count.
+- `scripts/28_verify_revision.py`. A second verification script covering
+  every family above. Same contract as script 21: it loads no model, reads no
+  dataset, and recomputes each value from the released artifacts. 87 checks,
+  0 failures.
+
+**What the replaced fraction showed.** With momentum m and step count S, BN
+running statistics retain a source component of (1 - m)^S, so the replaced
+fraction is rho = 1 - (1 - m)^S. Across ten configurations the per-class
+damage is monotone in rho (Spearman -0.988), and each of the two fixed-rho
+pairs rejects a momentum-only account on its own: (0.07, S=35) measures -5.46
+where its momentum predicts about -21.5, and (0.05, S=70) measures -21.67
+where its momentum predicts -6.63. For small m the product mS matches as
+well, so the data show monotonicity in mS without singling out the exact form
+of the expression. Separating the two needs a large-m configuration with few
+enough steps to stay on the ramp, which was not run.
+
+The curve is a steep ramp that saturates, not a step. `instagram` loses 6.8
+points as the surviving source fraction falls from 7.7% to 5.9%, another 6.2
+by 4.5%, then 1.6 by 3.5%, and little after that.
+
+**What the prevalence sweep showed.** Substituting the operating-point values
+into the break-even expression gives 28.9%, which treats both terms as
+constants in prevalence. Resampling shows they are not: the change on
+affected classes rises steeply with prevalence and the change on unaffected
+classes deepens as prevalence falls, from -2.98 at f = 0.35 to -4.61 at
+f = 0.05. The measured crossing is **39.4%**, not 28.9%. As prevalence
+approaches zero the net approaches roughly -4.8 points.
+
+**What the recalibration control ruled out.** Recalibrating on a pre-drift
+day and evaluating on data that did not drift moves accuracy by -0.12 to
+-0.42 points, always downward. Nothing improves off the report week, so the
+released running statistics are not stale in a way that accounts for the
+recovery.
+
+**Verification:** 87 checks in `28_verify_revision.py`, 0 failures, on top of
+the 231 in `21_verify_all.py`.
+
+**Known gap.** Per-class records exist for the filtered condition only, so
+the service column is blank for the statistics-only rows. Whether low-rho
+statistic recalibration also spares `instagram` is not measured, and the
+filtered curve does not transfer across conditions: at rho = 0.995
+statistics-only costs unaffected classes 4.89 points where filtered costs
+2.79.
 
 ---
 
@@ -43,20 +121,15 @@ the mechanism predicts; and per-class drift magnitude correlates positively
 with per-class benefit at every support floor (Spearman +0.27 to +0.54,
 moderate rather than tight). **The partition threshold is not load-bearing.**
 
-**What the per-class counts found, and it changes the paper's claim.**
-85 percent of the filtered method's net loss on undrifted traffic falls on
-one class. `instagram`, with 0.2 points of drift, goes from 0.9721 to 0.7548
-accuracy on 52,866 flows, in every window and at every seed. Excluding it,
-the filtered loss on undrifted traffic is 0.46 points while recalibration
-still costs 2.94. The two conditions fail differently: recalibration imposes
-a broad tax, and entropy filtering removes most of the broad tax while
-converting what remains into a tail. The affected side is heterogeneous too:
-10 of its 29 classes are harmed, including the largest, `google-www`, at
--9.54 points on 97,454 flows.
-
-The manuscript now states the cost as a tail risk rather than a budgetable
-average. That is a stronger operational claim than the aggregate it replaces,
-and it is the one the measurements support.
+**What the per-class counts found.** 85 percent of the filtered method's net
+loss on undrifted traffic falls on one class. `instagram`, with 0.2 points of
+drift, goes from 0.9721 to 0.7548 accuracy on 52,866 flows, in every window
+and at every seed. Excluding it, the filtered loss on undrifted traffic is
+0.46 points while recalibration still costs 2.94. The two conditions fail
+differently: recalibration imposes a broad tax, and entropy filtering removes
+most of the broad tax while converting what remains into a tail. The affected
+side is heterogeneous too: 10 of its 29 classes are harmed, including the
+largest, `google-www`, at -9.54 points on 97,454 flows.
 
 **Verification:** 231 checks, 0 failures. Sections 14 and 15 of
 `21_verify_all.py` cover every number above, and evaluate addendum rules R1
