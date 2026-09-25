@@ -13,7 +13,7 @@ identifiers:
     value: "10.5281/zenodo.21210654"
     description: "Zenodo archive of this repository"
 license: MIT
-version: "1.0.0"
+version: "2.0.0"
 date-released: "2026-07-05"
 keywords:
   - batch normalization
@@ -25,9 +25,9 @@ keywords:
   - test-time adaptation
 preferred-citation:
   type: article
-  title: "Decomposing Label-Free Test-Time Adaptation for Encrypted QUIC Traffic Classification Under Abrupt Temporal Drift"
+  title: "The Hidden Per-Class Cost of Test-Time Adaptation in Encrypted QUIC Traffic Classification"
   authors:
     - family-names: "Hegde"
       given-names: "Praveen"
-  journal: "IEEE Communications Letters"
+  journal: "IEEE Networking Letters"
   year: 2026
