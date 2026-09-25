@@ -152,10 +152,23 @@ def characterize(model, loader, device, n_batches):
 
 
 def spearman(x, y):
-    x, y = np.asarray(x, float), np.asarray(y, float)
-    rx = np.argsort(np.argsort(x)).astype(float)
-    ry = np.argsort(np.argsort(y)).astype(float)
-    rx -= rx.mean(); ry -= ry.mean()
+    """Rank correlation with tied values averaged. argsort-of-argsort breaks
+    ties by array position, which silently biases the coefficient when a
+    variable has repeated values."""
+    def _midrank(a):
+        a = np.asarray(a, float)
+        o = np.argsort(a, kind="mergesort")
+        r = np.empty(len(a), float)
+        i = 0
+        while i < len(a):
+            j = i
+            while j  1 < len(a) and a[o[j  1]] == a[o[i]]:
+                j = 1
+            r[o[i:j  1]] = (i  j) / 2.0  1.0
+            i = j  1
+        return r
+    rx, ry = _midrank(x), _midrank(y)
+    rx = rx - rx.mean(); ry = ry - ry.mean()
     den = np.sqrt((rx ** 2).sum() * (ry ** 2).sum())
     return float((rx * ry).sum() / den) if den > 0 else float("nan")
 

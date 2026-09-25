@@ -10,7 +10,6 @@ Nothing below may be edited after that commit. Any change requires a new
 pre-registration document with its own hash, and both remain in the record.
 
 Author: Praveen Hegde.
-Date drafted: [FILL BEFORE LOCKING].
 Supersedes nothing. Extends the protocol fixed in
 `PREREGISTRATION_switchpoint.md`
 (SHA-256 `4ebd14fbe8b721e9bb86683febd724b4ba7b08fb8a2d7c83a7444c37f9712e45`).
@@ -526,7 +525,5 @@ SHA-256 of this file as committed in the content commit named below, that is
 before these lines were filled in. A second commit records the hash. Both
 commits are given so that the ordering is checkable by anyone.
 
-SHA-256 of this file at lock time: [PASTE HASH FROM STEP 4]
-Content commit (the locked file):  [PASTE COMMIT FROM STEP 4]
-Recording commit (these lines):    [PASTE AFTER STEP 6]
-Pushed to the public repository at: [PASTE DATE AND REMOTE]
+SHA-256 of this file at lock time: 8f5fabbf0ec26b6ca11541361644d1c2242d6e0d54c1e3ea5820c31e0d077fbd
+Content commit (the locked file):  67885ab
