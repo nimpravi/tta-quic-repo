@@ -113,7 +113,7 @@ released.
 
 ```bash
 python scripts/21_verify_all.py      # 231 checks, 0 failures
-python scripts/28_verify_revision.py # 87 checks, 0 failures
+python scripts/28_verify_revision.py # 154 checks, 0 failures
 ```
 
 Script 21 covers the families through v6; script 28 covers the families added
@@ -360,9 +360,11 @@ post-hoc analyses:
 
 - `PREREGISTRATION_switchpoint.md`, hash-locked before the switch-point
   selection it governs (SHA-256 `4ebd14fb…712e45`).
-- `PREREGISTRATION_streaming_delayed_label.md`, governing Experiments A to E.
-  Its section 0.1 records which families it preceded and which it did not,
-  and section 10 records its lock.
+- `PREREGISTRATION_streaming_delayed_label.md`, governing Experiments A to E
+  (SHA-256 `8f5fabbf…077fbd`, content commit 67885ab). Its section 0.1
+  records which families it preceded and which it did not; its section 10 and
+  `results/RESULTS.md` section 7.9 record its lock. Its header still reads
+  "DRAFT" because that line sits inside the hashed content.
 - `ADDENDUM_partition_threshold.md`, hash-locked before its rerun
   (SHA-256 `97494a2e…6142c`).
 - `ADDENDUM_predrift_labels.md` and `ADDENDUM_source_day_sweep.md`, declared

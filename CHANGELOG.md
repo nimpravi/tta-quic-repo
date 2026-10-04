@@ -41,7 +41,7 @@ and the step count at 50, and these runs vary both.
   fraction fixed while trading momentum against step count.
 - `scripts/28_verify_revision.py`. A second verification script covering
   every family above. Same contract as script 21: it loads no model, reads no
-  dataset, and recomputes each value from the released artifacts. 87 checks,
+  dataset, and recomputes each value from the released artifacts. 154 checks,
   0 failures.
 
 **What the replaced fraction showed.** With momentum m and step count S, BN
@@ -73,7 +73,7 @@ day and evaluating on data that did not drift moves accuracy by -0.12 to
 released running statistics are not stale in a way that accounts for the
 recovery.
 
-**Verification:** 87 checks in `28_verify_revision.py`, 0 failures, on top of
+**Verification:** 154 checks in `28_verify_revision.py`, 0 failures, on top of
 the 231 in `21_verify_all.py`.
 
 **Known gap.** Per-class records exist for the filtered condition only, so
